@@ -584,6 +584,55 @@
     margin: 0 6px;
     vertical-align: middle;
   }
+
+  /* ── COLLAPSE BANNER ── */
+  #collapse-banner {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cream);
+    background: rgba(176, 28, 10, 0.94);
+    border: 1px solid var(--red-bright);
+    padding: 5px 18px;
+    display: none;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 0 18px rgba(176, 28, 10, 0.55);
+  }
+
+  /* ── BRIDGE RING PULSE ── */
+  @keyframes bridgePulse {
+    0%, 100% { stroke-opacity: 0.9; }
+    50%       { stroke-opacity: 0.2; }
+  }
+  .bridge-ring {
+    animation: bridgePulse 1.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* ── ANOMALY RANKING ── */
+  .anomaly-row .rank-val { color: var(--red-bright); }
+  .anomaly-cols {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .anomaly-col {
+    font-size: 0.5rem;
+    color: var(--gray-mid);
+    width: 32px;
+    text-align: right;
+  }
+  .anomaly-col.hi { color: var(--yellow-bruise); }
+  .anomaly-col.red { color: var(--red-bright); }
 </style>
 </head>
 <body>
@@ -604,7 +653,11 @@
       <button class="mode-btn" data-mode="reset">↺ Reset</button>
       <div style="width:1px;height:18px;background:var(--border-accent);margin:0 2px;align-self:center;flex-shrink:0;"></div>
       <button class="mode-btn" id="layout-btn">&#9671; Grupy</button>
+      <div style="width:1px;height:18px;background:var(--border-accent);margin:0 2px;align-self:center;flex-shrink:0;"></div>
+      <button class="mode-btn" id="collapse-btn">&#9636; Rozpad</button>
+      <button class="mode-btn" id="bridges-btn">&#9670; Mosty</button>
     </div>
+    <div id="collapse-banner"></div>
     <svg id="graph-svg"></svg>
   </div>
 
@@ -633,6 +686,7 @@
         <div class="rank-tab" data-rank="betweenness">Pośred.</div>
         <div class="rank-tab" data-rank="closeness">Bliskość</div>
         <div class="rank-tab" data-rank="pagerank">PageRank</div>
+        <div class="rank-tab" data-rank="anomaly">Anomalie</div>
       </div>
       <div id="ranking-list"></div>
     </div>
@@ -646,38 +700,6 @@
   <div class="tt-row"><span class="tt-key">PageRank</span><span class="tt-val" id="tt-pr"></span></div>
 </div>
 
-<div id="interpretation">
-  <h2>Interpretacja Humanistyczna</h2>
-  <div class="section-rule"></div>
-
-  <div class="stat-grid" id="stat-grid">
-    <div class="stat-box"><div class="s-val" id="s-nodes">—</div><div class="s-label">Postacie</div></div>
-    <div class="stat-box"><div class="s-val" id="s-edges">—</div><div class="s-label">Relacje</div></div>
-    <div class="stat-box"><div class="s-val" id="s-density">—</div><div class="s-label">Gęstość</div></div>
-    <div class="stat-box"><div class="s-val" id="s-comms">—</div><div class="s-label">Społeczności</div></div>
-  </div>
-
-  <h3>§ I — Architektura Narcystycznej Apokalipsy</h3>
-  <p>Sieć postaci <strong>Fight Club</strong> (1999, reż. David Fincher) liczy <span id="interp-nodes">—</span> węzłów i <span id="interp-edges">—</span> krawędzi przy gęstości <span id="interp-density">—</span>. Niska gęstość to nie defekt — to <strong>diagnoza narracyjna</strong>: świat Narratora to konstelacja satelitów krążących wokół jednego centrum grawitacyjnego, nie organiczna wspólnota. Większość relacji przebiega przez dwa punkty, które w finale okazują się jednym. Graf jest nierozerwalnie spójny, lecz ta spójność jest pozorna — sieć utrzymuje się dzięki pojedynczej, patologicznej tożsamości.</p>
-
-  <h3>§ II — Centralność: Jack i Tyler jako dwa ciała w jednej orbicie</h3>
-  <p><strong>JACK</strong> dominuje wszystkie miary centralności — jego stopień ważony wynosi kilkadziesiąt jednostek, a betweenness zbliża się do maksimum. Jest tym, przez którego przechodzi każda rozmowa, każda scena. To klasyczna <em>gwiazda ego-sieci</em>: sieć istnieje tylko dlatego, że on istnieje. Paradoksalnie jednak <strong>TYLER</strong> zajmuje drugie miejsce w każdej mierze — szczególnie wysoki betweenness Tylera ujawnia, że wiele relacji drugorzędnych jest możliwych tylko przez niego. Tyler to alter ego Jacka zreifikowane do postaci węzła — brakujące ja, które zarządza częścią tożsamości, do której Narrator nie ma dostępu.</p>
-  <p><strong>MARLA</strong> tworzy trzeci wierzchołek trójkąta: stosunkowo wysoka bliskość (closeness) przy niskim stopniu wskazuje, że dociera do całej sieci krótką ścieżką — symbolicznie: Marla jest jedyną prawdziwą osobą w tej historii, jedyną, do której Narrator nie może być obojętny.</p>
-
-  <h3>§ III — Struktura Społeczności: Kluby jako Bańki Tożsamości</h3>
-  <p>Algorytm detekcji społeczności wyodrębnia <span id="interp-comms">—</span> grup. Pierwsza to <strong>triada władzy</strong> (Jack–Tyler–Marla) — jądro narracji. Drugą tworzą <strong>Space Monkeys</strong> — Ricky, Mechanic, Angel Face, Another Space Monkey — tj. szeregowi członkowie Fight Club / Projektu Mayhem. To najgęstszy lokalny klaster: wysoki clustering coefficient świadczy o tym, że są zamkniętym środowiskiem, <em>rojem bez twarzy</em>. Trzecia społeczność obejmuje grupy wsparcia: Bob, Everyone, Leader, Chloe, Speaker — świat emocjonalnej protezi, który Narrator odwiedza, zanim znajdzie inną formę ucieczki. Czwarta to <strong>aparat państwa</strong> — detektywi, policja — z grupy peryferyjnej, która pojawia się gdy narracja zbliża się do konsekwencji.</p>
-
-  <h3>§ IV — Mosty Strukturalne i Anomalie</h3>
-  <p><strong>BOB</strong> (Robert Paulson) jest mostem między grupą wsparcia a Fight Clubem — jedyną postacią, która przeszła z przestrzeni emocjonalnej w przestrzeń przemocy. Jego śmierć w fabule odpowiada strukturalnemu usunięciu mostu: po niej dwie społeczności stają się hermetyczne. <strong>Mechanic</strong> i <strong>Ricky</strong> mają relatywnie wysoki clustering coefficient — tworzą mikrospołeczność wewnątrz Fight Clubu. <strong>EVERYONE</strong>, <strong>ALL SPACE MONKEYS</strong>, <strong>OTHERS TOGETHER</strong> — to węzły-kolektywy, które scenariusz traktuje jako ciała zbiorowe; ich obecność w grafie potwierdza, że narracja odmawia im indywidualności.</p>
-  <p>Szczególną anomalią jest węzeł <strong>"JACK / NO... TYLER"</strong> — artefakt scenariusza dokumentujący moment pęknięcia tożsamości, kiedy skrypt przestaje wiedzieć, kto mówi. W grafie ten węzeł łączy się z Jackiem, Tylerem, Marlą i Space Monkeys — jest dosłownie punktem kolizji dwóch ja.</p>
-
-  <h3>§ V — Propozycje Dalszych Analiz</h3>
-  <p><strong>1. Analiza temporalna scen:</strong> Podział krawędzi na dwie warstwy czasowe (przed/po ujawnieniu tożsamości Tylera) ujawniłby, jak sieć zmienia strukturę w momencie narratologicznego zwrotu.</p>
-  <p><strong>2. Sieć bipartite postać–lokacja:</strong> Włączenie lokacji (piwnica, dom przy Paper Street, biuro) jako węzłów drugiego typu pokazałoby, jak przestrzeń segmentuje tożsamości.</p>
-  <p><strong>3. Analiza sentymentu dialogów:</strong> Ważenie krawędzi nie tylko współwystępowaniem, ale walencją emocjonalną dialogu (agresja, ironia, czułość) zmieniłoby obraz centralności.</p>
-  <p><strong>4. Usuwanie węzłów (robustness):</strong> Symulacja sekwencyjnego usuwania węzłów — od Jacka do Tylera — modelowałaby narracyjny efekt terapii dysocjacyjnej jako rozpad sieci.</p>
-  <p><strong>5. Porównanie z innymi sieciami Finchera:</strong> Zestawienie grafu Fight Club z sieciami z <em>Siedem</em> i <em>Zodiaka</em> mogłoby ujawnić strukturalne signatury reżyserskiego stylu: czy Fincher konsekwentnie buduje sieci zdominowane przez pojedyncze centrum?</p>
-</div>
 
 <script>
 const embedMode = new URLSearchParams(window.location.search).get('embed');
@@ -1192,14 +1214,6 @@ function getHeroLabelSize(node, mode = 'degree') {
 }
 
 // Update stats
-document.getElementById('s-nodes').textContent = nodes.length;
-document.getElementById('s-edges').textContent = edges.length;
-document.getElementById('s-density').textContent = density.toFixed(3);
-document.getElementById('s-comms').textContent = numCommunities;
-document.getElementById('interp-nodes').textContent = nodes.length;
-document.getElementById('interp-edges').textContent = edges.length;
-document.getElementById('interp-density').textContent = density.toFixed(3);
-document.getElementById('interp-comms').textContent = numCommunities;
 
 // ===== BUILD LEGEND =====
 const commCounts = {};
@@ -1293,8 +1307,8 @@ svg.on('click', function(e) {
 // Weight range for edge styling
 const weights = edges.map(e => e.weight);
 const wMin = Math.min(...weights), wMax = Math.max(...weights);
-const wScale = d3.scaleLinear().domain([wMin, wMax]).range([0.4, 4]);
-const wOpacity = d3.scaleLinear().domain([wMin, wMax]).range([0.15, 0.8]);
+const wScale = d3.scaleLinear().domain([wMin, wMax]).range([0.6, 4.5]);
+const wOpacity = d3.scaleLinear().domain([wMin, wMax]).range([0.38, 0.88]);
 
 // Build link objects
 const linkData = edges.map(e => ({
@@ -1316,7 +1330,7 @@ const simulation = d3.forceSimulation(nodes)
 
 const linkSel = g.append('g').selectAll('line')
   .data(linkData).join('line')
-  .attr('stroke', heroMode ? 'rgba(216, 205, 192, 0.3)' : '#3a2820')
+  .attr('stroke', heroMode ? 'rgba(216, 205, 192, 0.3)' : '#6a4832')
   .attr('stroke-width', d => heroMode ? Math.max(heroEdgeMinWidth, d.strokeWidth * heroEdgeWidthMultiplier) : d.strokeWidth)
   .attr('stroke-opacity', d => heroMode ? Math.max(heroEdgeMinOpacity, d.opacity * heroEdgeOpacityMultiplier) : d.opacity);
 
@@ -1373,6 +1387,12 @@ simulation.on('tick', () => {
     .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
     .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
   nodeGroup.attr('transform', d => `translate(${d.x},${d.y})`);
+  if (bridgeRingLayer) {
+    bridgeRingLayer.selectAll('circle').attr('cx', d => d.x).attr('cy', d => d.y);
+  }
+  if (islandRingLayer) {
+    islandRingLayer.selectAll('circle').attr('cx', d => d.x).attr('cy', d => d.y);
+  }
 });
 
 // Auto-fit after simulation
@@ -1513,7 +1533,39 @@ function showNodeCard(d) {
 let currentRankMetric = 'degree';
 let currentFilterComm = null;
 
+function renderAnomalyRanking() {
+  const avgRatio = nodes.reduce((s, n) => s + (n.degree > 0 ? n.betweenness / n.degree : 0), 0) / nodes.length;
+  const anomalies = nodes
+    .map(n => ({ ...n, ratio: n.degree > 0 ? n.betweenness / n.degree : 0 }))
+    .filter(n => n.ratio > avgRatio)
+    .sort((a, b) => b.ratio - a.ratio);
+
+  const listEl = document.getElementById('ranking-list');
+  if (anomalies.length === 0) {
+    listEl.innerHTML = '<div style="padding:14px;font-size:0.62rem;color:var(--gray-mid);letter-spacing:0.1em;text-transform:uppercase;">Brak anomalii</div>';
+    return;
+  }
+  listEl.innerHTML = anomalies.map((n, i) => `
+    <div class="rank-row anomaly-row" data-id="${n.id}">
+      <div class="rank-num">${i+1}</div>
+      <div class="rank-dot" style="background:${n.color}"></div>
+      <div class="rank-name">${n.label}</div>
+      <div class="anomaly-cols">
+        <div class="anomaly-col">${n.degree.toFixed(0)}</div>
+        <div class="anomaly-col hi">${n.betweenness.toFixed(3)}</div>
+        <div class="anomaly-col red">${n.ratio.toFixed(4)}</div>
+      </div>
+    </div>`).join('');
+  listEl.querySelectorAll('.anomaly-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const nd = nodes.find(n => n.id === row.dataset.id);
+      if (nd) { highlightNode(nd); showNodeCard(nd); }
+    });
+  });
+}
+
 function renderRanking() {
+  if (currentRankMetric === 'anomaly') { renderAnomalyRanking(); return; }
   const metric = currentRankMetric;
   let sorted = [...nodes].sort((a, b) => b[metric] - a[metric]);
   if (currentFilterComm !== null) sorted = sorted.filter(n => n.community === currentFilterComm);
@@ -1557,14 +1609,277 @@ function filterRankByCommunity(ci) {
 
 renderRanking();
 
-// Resize
-window.addEventListener('resize', () => {
-  width = container.clientWidth;
-  height = container.clientHeight;
+function refreshGraphLayout({ fit = false } = {}) {
+  const nextWidth = container.clientWidth;
+  const nextHeight = container.clientHeight;
+
+  if (nextWidth < 40 || nextHeight < 40) return false;
+
+  const sizeChanged = nextWidth !== width || nextHeight !== height;
+  width = nextWidth;
+  height = nextHeight;
+
   svg.attr('width', width).attr('height', height);
   simulation.force('center', d3.forceCenter(width / 2, height / 2));
-  simulation.alphaTarget(0.05).restart();
-  setTimeout(() => simulation.alphaTarget(0), 500);
+
+  if (sizeChanged) {
+    simulation.alphaTarget(0.08).restart();
+    setTimeout(() => simulation.alphaTarget(0), 500);
+  }
+
+  if (fit) {
+    setTimeout(() => autoFit(), 220);
+  }
+  return true;
+}
+
+// Resize
+window.addEventListener('resize', () => {
+  refreshGraphLayout();
+});
+
+// When the iframe becomes visible in Reveal, parent asks for a relayout.
+window.addEventListener('message', (event) => {
+  if (!event.data || event.data.type !== 'fight-club:refresh-layout') return;
+  if (!refreshGraphLayout({ fit: true })) {
+    setTimeout(() => refreshGraphLayout({ fit: true }), 140);
+  }
+});
+
+// Handle hidden->visible transitions when this page is embedded.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshGraphLayout({ fit: true });
+});
+
+if ('ResizeObserver' in window) {
+  const resizeObserver = new ResizeObserver(() => {
+    refreshGraphLayout();
+  });
+  resizeObserver.observe(container);
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => refreshGraphLayout({ fit: true }), 120);
+});
+
+// ===== FEATURE 1: ROZPAD (Collapse) — with island separation =====
+
+let collapseActive = false;
+const COLLAPSE_IDS = new Set(['JACK', 'TYLER']);
+const ISLAND_COLORS = ['#c8960a','#4090c0','#9040a0','#3aaa70','#c05030','#6070b0','#b03060','#30b0a0','#a07820','#7050a0'];
+
+let islandRingLayer = null;
+let collapseIslandMembership = null;
+let collapseIslandTargets = null;
+
+function getComponentMembership(excludeIds) {
+  const excluded = new Set(excludeIds);
+  const active = nodes.filter(n => !excluded.has(n.id));
+  const membership = {};
+  const components = [];
+  const visited = new Set();
+  for (const n of active) {
+    if (visited.has(n.id)) continue;
+    const comp = [];
+    const queue = [n.id];
+    visited.add(n.id);
+    while (queue.length) {
+      const u = queue.shift();
+      comp.push(u);
+      for (const v of adj[u]) {
+        if (!excluded.has(v) && !visited.has(v)) { visited.add(v); queue.push(v); }
+      }
+    }
+    components.push(comp);
+  }
+  // largest first → index 0 = main cluster
+  components.sort((a, b) => b.length - a.length);
+  components.forEach((comp, i) => comp.forEach(id => membership[id] = i));
+  return { components, membership };
+}
+
+function islandClusterForce(alpha) {
+  if (!collapseIslandTargets || !collapseIslandMembership) return;
+  nodes.forEach(n => {
+    if (COLLAPSE_IDS.has(n.id)) return;
+    const ci = collapseIslandMembership[n.id];
+    if (ci === undefined || !collapseIslandTargets[ci]) return;
+    const t = collapseIslandTargets[ci];
+    n.vx += (t.x - n.x) * 0.55 * alpha;
+    n.vy += (t.y - n.y) * 0.55 * alpha;
+  });
+}
+
+document.getElementById('collapse-btn').addEventListener('click', () => {
+  collapseActive = !collapseActive;
+  const btn = document.getElementById('collapse-btn');
+  const banner = document.getElementById('collapse-banner');
+
+  if (collapseActive) {
+    btn.classList.add('active');
+    btn.textContent = '\u21BA Przywr\u00F3\u0107';
+
+    // Fade out excluded nodes and their edges
+    nodeGroup.transition().duration(400)
+      .attr('opacity', d => COLLAPSE_IDS.has(d.id) ? 0 : 1)
+      .style('pointer-events', d => COLLAPSE_IDS.has(d.id) ? 'none' : null);
+    linkSel.transition().duration(400)
+      .attr('stroke-opacity', d =>
+        (COLLAPSE_IDS.has(d.source.id) || COLLAPSE_IDS.has(d.target.id)) ? 0 : d.opacity);
+
+    // Rebuild link force WITHOUT edges touching JACK/TYLER — otherwise D3's spring
+    // force pulls all their neighbours toward their (invisible) position, blowing up the layout
+    const activeLinks = linkData.filter(d =>
+      !COLLAPSE_IDS.has(d.source.id) && !COLLAPSE_IDS.has(d.target.id));
+    simulation.force('link', d3.forceLink(activeLinks)
+      .id(d => d.id)
+      .distance(d => Math.max(40, 200 / (1 + d.weight * 0.2)))
+      .strength(0.5));
+
+    // Compute islands
+    const { components, membership } = getComponentMembership(['JACK', 'TYLER']);
+    collapseIslandMembership = membership;
+    const nc = components.length;
+
+    // Layout: largest island near center, rest arranged in a ring
+    const cx = width / 2, cy = height / 2;
+    const ringR = Math.min(width, height) * (nc <= 5 ? 0.30 : nc <= 10 ? 0.33 : 0.36);
+    collapseIslandTargets = { 0: { x: cx, y: cy } };
+    for (let i = 1; i < nc; i++) {
+      const angle = (2 * Math.PI * (i - 1) / (nc - 1)) - Math.PI / 2;
+      collapseIslandTargets[i] = {
+        x: cx + ringR * Math.cos(angle),
+        y: cy + ringR * Math.sin(angle)
+      };
+    }
+
+    // Colored island rings
+    if (islandRingLayer) islandRingLayer.remove();
+    islandRingLayer = g.append('g').attr('class', 'island-ring-layer');
+    islandRingLayer.selectAll('circle')
+      .data(nodes.filter(n => !COLLAPSE_IDS.has(n.id)))
+      .join('circle')
+      .attr('r', d => getNodeRadius(d, currentMode) + 5)
+      .attr('fill', 'none')
+      .attr('stroke', d => ISLAND_COLORS[(collapseIslandMembership[d.id] || 0) % ISLAND_COLORS.length])
+      .attr('stroke-width', 1.8)
+      .attr('stroke-opacity', 0.8)
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y);
+
+    // Weaker charge + island cluster force → components drift apart
+    simulation.force('islandCluster', islandClusterForce);
+    simulation.force('charge').strength(-55);
+    simulation.alphaTarget(0.35).restart();
+    setTimeout(() => simulation.alphaTarget(0), 3500);
+
+    banner.style.display = 'none';
+
+  } else {
+    btn.classList.remove('active');
+    btn.textContent = '\u25A0 Rozpad';
+
+    // Restore full link force (with JACK/TYLER edges back in)
+    simulation.force('link', d3.forceLink(linkData)
+      .id(d => d.id)
+      .distance(d => Math.max(40, 200 / (1 + d.weight * 0.2)))
+      .strength(0.5));
+    nodeGroup.transition().duration(400).attr('opacity', 1).style('pointer-events', null);
+    linkSel.transition().duration(400).attr('stroke-opacity', d => d.opacity);
+
+    simulation.force('islandCluster', null);
+    simulation.force('charge').strength(clusterMode ? -35 : -180);
+    simulation.alphaTarget(0.15).restart();
+    setTimeout(() => simulation.alphaTarget(0), 1500);
+
+    collapseIslandMembership = null;
+    collapseIslandTargets = null;
+    if (islandRingLayer) { islandRingLayer.remove(); islandRingLayer = null; }
+    banner.style.display = 'none';
+  }
+});
+
+// ===== FEATURE 2: MOSTY (Bridges) =====
+
+let bridgesActive = false;
+let bridgeRingLayer = null;
+
+function findBridges() {
+  const bridges = new Set();
+  const bridgeNodes = new Set();
+  const visited = {};
+  const disc = {};
+  const low = {};
+  const parent = {};
+  let timer = 0;
+
+  nodes.forEach(n => { visited[n.id] = false; parent[n.id] = null; });
+
+  function dfs(u) {
+    visited[u] = true;
+    disc[u] = low[u] = timer++;
+    for (const v of adj[u]) {
+      if (!visited[v]) {
+        parent[v] = u;
+        dfs(v);
+        low[u] = Math.min(low[u], low[v]);
+        if (low[v] > disc[u]) {
+          bridges.add([u, v].sort().join('\u001F'));
+          bridgeNodes.add(u);
+          bridgeNodes.add(v);
+        }
+      } else if (v !== parent[u]) {
+        low[u] = Math.min(low[u], disc[v]);
+      }
+    }
+  }
+
+  nodes.forEach(n => { if (!visited[n.id]) dfs(n.id); });
+  return { bridges, bridgeNodes };
+}
+
+function edgeBridgeKey(d) {
+  return [d.source.id, d.target.id].sort().join('\u001F');
+}
+
+document.getElementById('bridges-btn').addEventListener('click', () => {
+  bridgesActive = !bridgesActive;
+  const btn = document.getElementById('bridges-btn');
+
+  if (bridgesActive) {
+    btn.classList.add('active');
+    const { bridges, bridgeNodes } = findBridges();
+
+    linkSel
+      .attr('stroke', d => bridges.has(edgeBridgeKey(d)) ? '#e02010' : '#6a4832')
+      .attr('stroke-opacity', d => bridges.has(edgeBridgeKey(d)) ? 0.88 : d.opacity * 0.45)
+      .attr('stroke-dasharray', d => bridges.has(edgeBridgeKey(d)) ? '6 3' : null)
+      .attr('stroke-width', d => bridges.has(edgeBridgeKey(d)) ? Math.max(2, d.strokeWidth) : d.strokeWidth);
+
+    if (bridgeRingLayer) bridgeRingLayer.remove();
+    bridgeRingLayer = g.append('g').attr('class', 'bridge-ring-layer');
+    const bridgeNodeData = nodes.filter(n => bridgeNodes.has(n.id));
+    bridgeRingLayer.selectAll('circle')
+      .data(bridgeNodeData)
+      .join('circle')
+      .attr('class', 'bridge-ring')
+      .attr('r', d => getNodeRadius(d, currentMode) + 5)
+      .attr('fill', 'none')
+      .attr('stroke', '#c8960a')
+      .attr('stroke-width', 2.5)
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y);
+  } else {
+    btn.classList.remove('active');
+
+    linkSel
+      .attr('stroke', '#6a4832')
+      .attr('stroke-opacity', d => d.opacity)
+      .attr('stroke-dasharray', null)
+      .attr('stroke-width', d => d.strokeWidth);
+
+    if (bridgeRingLayer) { bridgeRingLayer.remove(); bridgeRingLayer = null; }
+  }
 });
 </script>
 </body>

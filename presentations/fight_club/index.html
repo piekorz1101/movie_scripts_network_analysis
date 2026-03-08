@@ -134,6 +134,7 @@
       color: var(--red);
       border-radius: 2px;
       margin-bottom: 1rem;
+      display: none;
     }
 
     .tag.gold { border-color: var(--gold-dim); color: var(--gold); }
@@ -216,6 +217,142 @@
     }
     .ascii-diagram .node { color: var(--gold); }
     .ascii-diagram .node-red { color: var(--red); }
+
+    /* ── Slide 2 — SNA basics ── */
+    .slide-sna-basics h2 {
+      font-size: 3.05rem;
+      margin-bottom: 0.38em;
+    }
+    .slide-sna-basics h3 {
+      font-size: 1.14rem;
+      margin-bottom: 1.15rem;
+    }
+    .slide-sna-basics .def-box {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 0.82rem;
+    }
+    .slide-sna-basics .formula-inline {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+    }
+    .sna-intro-grid {
+      display: grid;
+      grid-template-columns: 1.02fr 0.98fr;
+      align-items: start;
+      gap: 1.1rem;
+      margin-bottom: 0.9rem;
+    }
+    .sna-card {
+      background: linear-gradient(180deg, #171717 0%, #121212 100%);
+      border: 1px solid var(--border);
+      padding: 0.84em 1.02em 0.95em;
+    }
+    .sna-card-title {
+      font-family: var(--mono);
+      font-size: 0.81rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+    }
+    .sna-mini-graph {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #0d0d0d;
+      border: 1px solid #202020;
+    }
+    .sna-mini-graph .edge-line {
+      stroke: #bfa360;
+      stroke-width: 2.5;
+      opacity: 0.85;
+    }
+    .sna-mini-graph .edge-line.edge-alt {
+      stroke: #8f7a48;
+      stroke-dasharray: 4 4;
+      opacity: 0.75;
+    }
+    .sna-mini-graph .node-dot {
+      fill: #942a20;
+      stroke: #d8c7b0;
+      stroke-width: 1.4;
+    }
+    .sna-mini-graph .node-dot.node-main {
+      fill: #c0392b;
+    }
+    .sna-mini-graph .node-label {
+      font-family: var(--mono);
+      font-size: 12.8px;
+      fill: #f0e6d8;
+      letter-spacing: 0.08em;
+    }
+    .sna-mini-graph .guide-line {
+      stroke: #8c8c8c;
+      stroke-width: 1.1;
+      stroke-dasharray: 4 4;
+      marker-end: url(#sna-arrow-tip);
+      opacity: 0.8;
+    }
+    .sna-mini-graph .guide-label {
+      font-family: var(--mono);
+      font-size: 12px;
+      fill: #d2d2d2;
+      letter-spacing: 0.13em;
+    }
+    .sna-mini-graph .guide-desc {
+      font-family: var(--mono);
+      font-size: 10.8px;
+      fill: #909090;
+      letter-spacing: 0.06em;
+    }
+    .sna-weight-card .formula {
+      display: block;
+      margin: 0.2em 0 0.65em;
+      font-size: 0.9rem;
+      padding: 0.5em 0.7em;
+    }
+    .weight-example {
+      border-left: 3px solid var(--gold-dim);
+      background: #101010;
+      padding: 0.5em 0.7em;
+      margin-bottom: 0.5em;
+    }
+    .weight-example:last-child {
+      margin-bottom: 0;
+    }
+    .weight-example .w-head {
+      font-family: var(--body);
+      font-size: 0.98rem;
+      margin-bottom: 0.25em;
+      color: #dfdfdf;
+    }
+    .weight-example .w-scenes {
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    .weight-example .w-score {
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 0.25em;
+      color: var(--gold);
+    }
+    .slide-sna-basics .intro-keypoints {
+      position: relative;
+      z-index: 2;
+      margin-top: 0.15rem;
+    }
+    .slide-sna-basics .intro-keypoints li {
+      font-size: 0.95rem;
+      line-height: 1.34;
+      padding-top: 0.24em;
+      padding-bottom: 0.24em;
+    }
 
     /* ── Community badges ── */
     .community-list { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
@@ -389,11 +526,12 @@
     }
 
     /* ── iframe slide ── */
-    .iframe-slide {
+    .reveal .slides section.iframe-slide {
       padding: 0 !important;
       height: 100%;
-      display: flex;
-      flex-direction: column;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
     }
 
     .iframe-header {
@@ -418,18 +556,311 @@
       display: inline-block;
     }
 
-    .iframe-slide iframe {
-      flex: 1;
+    .reveal .slides section.iframe-slide iframe {
       width: 100%;
+      height: 100%;
+      min-height: 0;
       border: none;
       background: var(--black);
     }
 
+    /* ── Slide 6 — Degree concept ── */
+    .slide-degree-concept h2 {
+      margin-bottom: 0.22em;
+    }
+    .slide-degree-concept h3 {
+      margin-bottom: 0.95rem;
+    }
+    .degree-formula-hero {
+      background: linear-gradient(180deg, #181818 0%, #121212 100%);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--red);
+      padding: 0.75em 0.95em 0.68em;
+      margin-bottom: 0.72rem;
+    }
+    .degree-formula-main {
+      font-family: var(--mono);
+      font-size: 1.52rem;
+      color: var(--gold);
+      letter-spacing: 0.03em;
+      text-align: center;
+      margin-bottom: 0.45rem;
+    }
+    .degree-formula-main sub,
+    .degree-formula-main sup {
+      font-size: 0.65em;
+    }
+    .degree-formula-legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: #c8c8c8;
+      letter-spacing: 0.03em;
+    }
+    .degree-formula-legend span {
+      display: block;
+      padding: 0.34em 0.45em;
+      border: 1px solid rgba(123, 32, 24, 0.4);
+      background: rgba(0, 0, 0, 0.24);
+      line-height: 1.34;
+    }
+    .degree-formula-legend strong {
+      color: var(--red);
+    }
+    .degree-analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-bottom: 0.62rem;
+    }
+    .degree-card {
+      background: #141414;
+      border: 1px solid var(--border);
+      padding: 0.62em 0.74em;
+    }
+    .degree-card-title {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+    }
+    .degree-points li {
+      font-size: 0.82rem;
+      line-height: 1.34;
+      padding-top: 0.26em;
+      padding-bottom: 0.26em;
+    }
+    .degree-steps {
+      display: grid;
+      gap: 0.35rem;
+      margin-bottom: 0.45rem;
+    }
+    .degree-step {
+      font-size: 0.81rem;
+      line-height: 1.34;
+      color: #d8d8d8;
+      border-left: 2px solid var(--red-dim);
+      padding-left: 0.5em;
+    }
+    .degree-step .k {
+      display: inline-block;
+      width: 1.2em;
+      font-family: var(--mono);
+      color: var(--gold);
+    }
+    .degree-norm {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--gold);
+      letter-spacing: 0.03em;
+      background: #101010;
+      border: 1px solid var(--border);
+      padding: 0.35em 0.5em;
+    }
+    .degree-examples {
+      background: #121212;
+      border: 1px solid var(--border);
+      padding: 0.62em 0.74em;
+    }
+    .degree-example-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+    .degree-example {
+      border-left: 3px solid var(--red-dim);
+      background: #0f0f0f;
+      padding: 0.45em 0.55em;
+    }
+    .degree-example .name {
+      font-family: var(--display);
+      font-size: 1.12rem;
+      color: var(--red);
+      letter-spacing: 0.05em;
+      line-height: 1;
+      margin-bottom: 0.16em;
+    }
+    .degree-example .calc {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: #d0d0d0;
+      line-height: 1.32;
+    }
+    .degree-example .calc strong {
+      color: var(--gold);
+    }
+    .degree-example .interp {
+      font-size: 0.78rem;
+      color: #c2c2c2;
+      margin-top: 0.28em;
+      line-height: 1.34;
+    }
+
     /* ── Density visual ── */
+    .slide-density-concept h2 {
+      margin-bottom: 0.22em;
+    }
+    .slide-density-concept h3 {
+      margin-bottom: 1rem;
+    }
+    .density-formula-hero {
+      background: linear-gradient(180deg, #181818 0%, #121212 100%);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--gold);
+      padding: 0.85em 1em 0.75em;
+      margin-bottom: 0.7rem;
+    }
+    .density-formula-main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      margin-bottom: 0.55rem;
+    }
+    .density-formula-d,
+    .density-formula-eq {
+      font-family: var(--display);
+      font-size: 3.1rem;
+      line-height: 1;
+      color: var(--gold);
+    }
+    .density-frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 12.5ch;
+    }
+    .density-frac-top {
+      font-family: var(--mono);
+      color: var(--white);
+      font-size: 1.8rem;
+      line-height: 1.1;
+      padding: 0 0.35em 0.08em;
+    }
+    .density-frac-bar {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--gold);
+      opacity: 0.9;
+      margin: 0.05em 0;
+    }
+    .density-frac-bottom {
+      font-family: var(--mono);
+      color: var(--white);
+      font-size: 1.25rem;
+      line-height: 1.15;
+      padding: 0.06em 0.35em 0;
+    }
+    .density-formula-legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.55rem;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: #c9c9c9;
+      letter-spacing: 0.03em;
+    }
+    .density-formula-legend span {
+      display: block;
+      background: rgba(0, 0, 0, 0.24);
+      border: 1px solid rgba(125, 106, 46, 0.24);
+      padding: 0.35em 0.5em;
+      line-height: 1.35;
+    }
+    .density-formula-legend strong {
+      color: var(--gold);
+    }
+    .density-steps-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+    }
+    .density-step {
+      background: #131313;
+      border: 1px solid var(--border);
+      padding: 0.55em 0.7em 0.6em;
+    }
+    .density-step-final {
+      border-color: rgba(201, 168, 76, 0.38);
+      background: linear-gradient(180deg, #171410 0%, #13110f 100%);
+    }
+    .density-step-k {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.22em;
+    }
+    .density-step-v {
+      font-size: 0.84rem;
+      color: #e1e1e1;
+      margin-bottom: 0.16em;
+    }
+    .density-step-calc {
+      font-family: var(--mono);
+      font-size: 0.84rem;
+      line-height: 1.35;
+      color: #d0d0d0;
+    }
+    .density-step-calc strong {
+      color: var(--gold);
+    }
+    .density-step-note {
+      margin-top: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .density-calc-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 1rem;
+    }
+    .density-calc-card {
+      background: linear-gradient(180deg, #181818 0%, #121212 100%);
+      border: 1px solid var(--border);
+      padding: 0.8em 0.95em;
+      min-height: 100%;
+    }
+    .density-calc-title {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.55rem;
+    }
+    .density-calc-card p {
+      margin: 0.45em 0 0;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+    .density-keypoints {
+      margin-top: 0.1rem;
+    }
+    .density-keypoints li {
+      font-size: 0.85rem;
+      line-height: 1.36;
+      padding-top: 0.3em;
+      padding-bottom: 0.3em;
+    }
+
+    .slide-density-data .formula {
+      font-size: 0.82rem;
+      margin: 0.3em 0 0.8em;
+    }
     .density-compare {
       display: flex;
-      gap: 2rem;
-      margin: 1em 0;
+      gap: 1rem;
+      margin: 0.7em 0 0.8em;
       align-items: flex-start;
     }
 
@@ -437,28 +868,63 @@
       flex: 1;
       background: var(--surface);
       border: 1px solid var(--border);
-      padding: 1em;
-      text-align: center;
+      padding: 0.75em 0.8em;
+      text-align: left;
       font-family: var(--mono);
       font-size: 0.75rem;
     }
 
     .density-box svg {
       display: block;
-      margin: 0.5em auto;
+      margin: 0.45em auto 0.35em;
+      width: 100%;
+      max-width: 220px;
+      height: auto;
     }
 
     .density-box .d-label {
       color: var(--muted);
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      font-size: 0.68rem;
+      font-size: 0.64rem;
+      line-height: 1.4;
     }
     .density-box .d-val {
       color: var(--gold);
-      font-size: 1rem;
+      font-size: 0.92rem;
+      font-weight: 600;
       display: block;
-      margin-top: 0.3em;
+      margin-top: 0.25em;
+    }
+    .density-box .d-note {
+      font-size: 0.72rem;
+      color: #b6b6b6;
+      line-height: 1.42;
+      margin-top: 0.35em;
+    }
+    .density-box-dense {
+      border-color: rgba(201, 168, 76, 0.36);
+    }
+    .density-box-sparse {
+      border-color: rgba(192, 57, 43, 0.45);
+    }
+
+    .density-takeaway-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-top: 0.15rem;
+    }
+    .density-takeaway {
+      background: #111;
+      border-left: 3px solid var(--red-dim);
+      padding: 0.6em 0.8em;
+      font-size: 0.78rem;
+      line-height: 1.44;
+      color: #d7d7d7;
+    }
+    .density-takeaway strong {
+      color: var(--gold);
     }
 
     /* ── Slide number ── */
@@ -527,27 +993,16 @@
    */
   const SLIDE_FILES = [
     'slides/01_tytul.html',
-    'slides/02_czym_jest_siec.html',
-    'slides/03_density_pojecie.html',
-    'slides/04_density_dane.html',
-    'slides/05_density_interpretacja.html',
-    'slides/06_degree_pojecie.html',
-    'slides/07_degree_dane.html',
-    'slides/08_degree_interpretacja.html',
-    'slides/09_betweenness_pojecie.html',
-    'slides/10_betweenness_dane.html',
-    'slides/11_betweenness_interpretacja.html',
-    'slides/12_closeness_pojecie.html',
-    'slides/13_closeness_interpretacja.html',
-    'slides/14_communities_pojecie.html',
-    'slides/15_communities_dane.html',
-    'slides/16_communities_interpretacja.html',
-    'slides/17_clustering_pojecie.html',
-    'slides/18_clustering_interpretacja.html',
-    'slides/19_bridges_pojecie.html',
-    'slides/20_bridges_interpretacja.html',
-    'slides/21_dalsza_analiza.html',
+    'slides/10_degree.html',
+    'slides/11_betweenness.html',
+    'slides/12_closeness.html',
+    'slides/13_pagerank.html',
     'slides/22_dashboard.html',
+    'slides/20_stat_overview.html',
+    'slides/21_centralnosc.html',
+    'slides/22_spolecznosci.html',
+    'slides/23_mosty_anomalie.html',
+    'slides/24_dalsze_analizy.html',
   ];
 
   async function loadAndInit() {
@@ -584,10 +1039,19 @@
       plugins: [],
     });
 
-    // Prevent Reveal scroll capturing on the dashboard iframe slide
+    // Keep iframe dashboard in sync when slide becomes visible
     Reveal.on('slidechanged', ({ currentSlide }) => {
+      const revealEl = document.querySelector('.reveal');
+      if (!revealEl) return;
+
       if (currentSlide.classList.contains('iframe-slide')) {
-        document.querySelector('.reveal').style.overflow = 'hidden';
+        revealEl.style.overflow = 'hidden';
+        const iframe = currentSlide.querySelector('iframe');
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage({ type: 'fight-club:refresh-layout' }, '*');
+        }
+      } else {
+        revealEl.style.overflow = '';
       }
     });
   }

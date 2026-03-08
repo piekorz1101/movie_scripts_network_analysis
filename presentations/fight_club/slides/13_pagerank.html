@@ -1,0 +1,59 @@
+<section class="slide-concept">
+<div class="metric-layout">
+  <div>
+    <div class="metric-eyebrow">Metryki sieci · 04 / 04</div>
+    <div class="metric-name">PageRank</div>
+    <div class="metric-en">pagerank centrality</div>
+    <div class="metric-def">
+      Ważność przez skojarzenie — postać ważna nie dlatego, że zna wiele osób, ale dlatego, że <em>zna ważne osoby</em>. Jeden kontakt z centrum = wysoki PageRank.
+    </div>
+    <div class="metric-example">
+      <div class="metric-example-label">Fight Club · przykład</div>
+      <p>Bycie połączonym z Jackiem daje wysoki PageRank nawet przy jednej relacji. Jack "przekazuje" swoją ważność wszystkim, z którymi współwystępuje.</p>
+    </div>
+    <div class="metric-insight">→ Różni się od stopnia: możesz znać 10 nieważnych osób (niski PR) albo jedną kluczową (wysoki PR).</div>
+  </div>
+  <div class="metric-visual">
+    <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr-pr" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <polygon points="0 0, 7 3.5, 0 7" fill="#7b2018" opacity="0.75"/>
+        </marker>
+        <marker id="arr-out" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <polygon points="0 0, 7 3.5, 0 7" fill="#c9a84c" opacity="0.85"/>
+        </marker>
+      </defs>
+      <!-- Many pointing TO Jack (importance flowing in) -->
+      <line x1="58" y1="58" x2="136" y2="126" stroke="#7b2018" stroke-width="2.2" marker-end="url(#arr-pr)"/>
+      <line x1="58" y1="140" x2="134" y2="140" stroke="#7b2018" stroke-width="2.2" marker-end="url(#arr-pr)"/>
+      <line x1="58" y1="222" x2="136" y2="154" stroke="#7b2018" stroke-width="2.2" marker-end="url(#arr-pr)"/>
+      <line x1="130" y1="28" x2="150" y2="114" stroke="#7b2018" stroke-width="1.4" marker-end="url(#arr-pr)" opacity="0.5"/>
+      <!-- Jack points to NARRATOR, sharing importance -->
+      <line x1="186" y1="136" x2="262" y2="100" stroke="#c9a84c" stroke-width="3" marker-end="url(#arr-out)"/>
+      <!-- Nodes pointing to JACK -->
+      <circle cx="58" cy="58" r="16" fill="#141414" stroke="#3a3a3a" stroke-width="1.4"/>
+      <text x="58" y="62.5" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="9" fill="#888">TYLER</text>
+      <circle cx="58" cy="140" r="16" fill="#141414" stroke="#3a3a3a" stroke-width="1.4"/>
+      <text x="58" y="144.5" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="9" fill="#888">MARLA</text>
+      <circle cx="58" cy="222" r="16" fill="#141414" stroke="#3a3a3a" stroke-width="1.4"/>
+      <text x="58" y="226.5" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="9" fill="#888">BOB</text>
+      <circle cx="128" cy="22" r="12" fill="#121212" stroke="#2a2a2a" stroke-width="1.2" opacity="0.7"/>
+      <text x="128" y="26" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="7.5" fill="#666">ANGEL</text>
+      <!-- JACK — center, large -->
+      <circle cx="160" cy="140" r="32" fill="#7b1a12" stroke="#c0392b" stroke-width="2.5"/>
+      <text x="160" y="144.5" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="20" fill="#f0e0d0" letter-spacing="0.08em">JACK</text>
+      <!-- NARRATOR — receives importance from JACK -->
+      <circle cx="272" cy="96" r="22" fill="#17140f" stroke="#c9a84c" stroke-width="2.2"/>
+      <text x="272" y="91" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#c9a84c">NARRA-</text>
+      <text x="272" y="103" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#c9a84c">TOR</text>
+      <!-- PR label on narrator -->
+      <text x="272" y="128" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="7.5" fill="#7d6a2e" letter-spacing="0.08em">wysoki PR</text>
+      <!-- annotation: "ważny bo zna ważnego" -->
+      <text x="272" y="195" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="7.5" fill="#555" letter-spacing="0.06em">ważny, bo zna</text>
+      <text x="272" y="207" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="7.5" fill="#555" letter-spacing="0.06em">ważną osobę</text>
+      <!-- summary -->
+      <text x="160" y="265" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#444" letter-spacing="0.1em">ważność przepływa przez krawędzie sieci</text>
+    </svg>
+  </div>
+</div>
+</section>

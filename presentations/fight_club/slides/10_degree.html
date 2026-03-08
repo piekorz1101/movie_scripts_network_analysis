@@ -1,0 +1,140 @@
+<section class="slide-concept">
+<style>
+/* ── Metric slides — shared layout ── */
+.metric-layout {
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  gap: 2.2rem;
+  align-items: center;
+  height: 100%;
+  padding-top: 1.4rem;
+  padding-bottom: 1.4rem;
+}
+.metric-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.55rem;
+}
+.metric-name {
+  font-family: var(--display);
+  font-size: 4rem;
+  line-height: 0.92;
+  color: var(--red);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.06em;
+}
+.metric-en {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 1.1rem;
+}
+.metric-def {
+  background: var(--surface);
+  border-left: 3px solid var(--red);
+  padding: 0.75em 1em;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: #ccc;
+  line-height: 1.58;
+  margin-bottom: 0.85rem;
+}
+.metric-example {
+  background: #0f0f0f;
+  border: 1px solid var(--border);
+  padding: 0.65em 0.9em;
+  margin-bottom: 0.85rem;
+}
+.metric-example-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.38rem;
+}
+.metric-example p {
+  font-size: 0.86rem;
+  line-height: 1.52;
+  margin: 0;
+  color: #ddd;
+}
+.metric-example em { color: var(--gold); font-style: normal; }
+.metric-insight {
+  font-size: 0.78rem;
+  color: var(--gold);
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+  line-height: 1.52;
+  border-top: 1px solid var(--border);
+  padding-top: 0.65rem;
+}
+.metric-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.metric-visual svg {
+  width: 100%;
+  height: auto;
+  max-height: 92%;
+}
+</style>
+
+<div class="metric-layout">
+  <div>
+    <div class="metric-eyebrow">Metryki sieci · 01 / 04</div>
+    <div class="metric-name">Stopień</div>
+    <div class="metric-en">degree centrality</div>
+    <div class="metric-def">
+      Liczba bezpośrednich połączeń węzła — ile różnych postaci pojawia się razem z daną postacią w scenach. Waga krawędzi pokazuje, jak często.
+    </div>
+    <div class="metric-example">
+      <div class="metric-example-label">Fight Club · przykład</div>
+      <p>Jack — <em>40 scen z Tylerem</em>, <em>19 z Marlą</em>. Największy stopień w sieci. Centralne miejsce w narracji.</p>
+    </div>
+    <div class="metric-insight">→ Kto jest popularny w narracji. Kto pojawia się często i z wieloma osobami.</div>
+  </div>
+  <div class="metric-visual">
+    <svg viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg">
+      <!-- Spokes from JACK -->
+      <line x1="150" y1="140" x2="150" y2="42" stroke="#7b2018" stroke-width="2.8" opacity="0.75"/>
+      <line x1="150" y1="140" x2="150" y2="238" stroke="#7b2018" stroke-width="1.6" opacity="0.5"/>
+      <line x1="150" y1="140" x2="52" y2="140" stroke="#7b2018" stroke-width="1.5" opacity="0.48"/>
+      <line x1="150" y1="140" x2="254" y2="140" stroke="#7b2018" stroke-width="3.5" opacity="0.9"/>
+      <line x1="150" y1="140" x2="74" y2="62" stroke="#7b2018" stroke-width="1.3" opacity="0.4"/>
+      <line x1="150" y1="140" x2="226" y2="218" stroke="#7b2018" stroke-width="1.2" opacity="0.35"/>
+      <!-- MARLA - top, gold accent -->
+      <circle cx="150" cy="42" r="19" fill="#171410" stroke="#7d6a2e" stroke-width="1.8"/>
+      <text x="150" y="46.5" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="11" fill="#c9a84c">MARLA</text>
+      <!-- BOB - bottom -->
+      <circle cx="150" cy="238" r="16" fill="#141414" stroke="#3a3a3a" stroke-width="1.4"/>
+      <text x="150" y="242.5" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="10.5" fill="#888">BOB</text>
+      <!-- ANGEL - left -->
+      <circle cx="52" cy="140" r="15" fill="#141414" stroke="#3a3a3a" stroke-width="1.4"/>
+      <text x="52" y="144.5" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="9" fill="#888">ANGEL</text>
+      <!-- TYLER - right, red accent -->
+      <circle cx="254" cy="140" r="22" fill="#1d1210" stroke="#c0392b" stroke-width="2.2"/>
+      <text x="254" y="144.5" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="16" fill="#e84030" letter-spacing="0.05em">TYLER</text>
+      <!-- small nodes -->
+      <circle cx="74" cy="62" r="12" fill="#121212" stroke="#2a2a2a" stroke-width="1.2" opacity="0.8"/>
+      <text x="74" y="66" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#666">RICKY</text>
+      <circle cx="226" cy="218" r="12" fill="#121212" stroke="#2a2a2a" stroke-width="1.2" opacity="0.8"/>
+      <text x="226" y="222" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#666">JILL</text>
+      <!-- JACK center -->
+      <circle cx="150" cy="140" r="30" fill="#7b1a12" stroke="#c0392b" stroke-width="2.2"/>
+      <text x="150" y="144.5" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="19" fill="#f0e0d0" letter-spacing="0.08em">JACK</text>
+      <!-- degree badge -->
+      <rect x="8" y="258" width="140" height="16" rx="1" fill="none"/>
+      <text x="150" y="272" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="9" fill="#444" letter-spacing="0.14em">degree = liczba połączeń</text>
+    </svg>
+  </div>
+</div>
+</section>

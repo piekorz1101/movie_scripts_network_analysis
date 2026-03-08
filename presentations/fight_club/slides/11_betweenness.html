@@ -1,0 +1,59 @@
+<section class="slide-concept">
+<div class="metric-layout">
+  <div>
+    <div class="metric-eyebrow">Metryki sieci · 02 / 04</div>
+    <div class="metric-name">Pośrednictwo</div>
+    <div class="metric-en">betweenness centrality</div>
+    <div class="metric-def">
+      Ile razy dana postać leży na najkrótszej ścieżce między dwiema innymi. Mierzy rolę <em>mostu</em> — bez niej część sieci zostaje odcięta.
+    </div>
+    <div class="metric-example">
+      <div class="metric-example-label">Fight Club · przykład</div>
+      <p>Bob ma niski stopień, ale <em>wysoki betweenness</em>. To on łączy świat grup wsparcia ze światem Fight Club. Bez niego te dwa środowiska nie mają połączenia.</p>
+    </div>
+    <div class="metric-insight">→ Wysoki betweenness przy niskim stopniu = rzadko się pojawia, ale kluczowy dla spójności sieci.</div>
+  </div>
+  <div class="metric-visual">
+    <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg">
+      <!-- Left cluster: support groups -->
+      <line x1="68" y1="80" x2="48" y2="160" stroke="#3a3a3a" stroke-width="1.5"/>
+      <line x1="68" y1="80" x2="88" y2="160" stroke="#3a3a3a" stroke-width="1.5"/>
+      <line x1="48" y1="160" x2="88" y2="160" stroke="#3a3a3a" stroke-width="1.5"/>
+      <!-- Right cluster: fight club -->
+      <line x1="252" y1="80" x2="232" y2="160" stroke="#3a3a3a" stroke-width="1.5"/>
+      <line x1="252" y1="80" x2="272" y2="160" stroke="#3a3a3a" stroke-width="1.5"/>
+      <line x1="232" y1="160" x2="272" y2="160" stroke="#3a3a3a" stroke-width="1.5"/>
+      <!-- Bridge: BOB to left and right clusters -->
+      <line x1="88" y1="160" x2="160" y2="190" stroke="#7d6a2e" stroke-width="2" stroke-dasharray="5 3" opacity="0.7"/>
+      <line x1="68" y1="80" x2="160" y2="190" stroke="#7d6a2e" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.5"/>
+      <line x1="160" y1="190" x2="232" y2="160" stroke="#7d6a2e" stroke-width="2" stroke-dasharray="5 3" opacity="0.7"/>
+      <line x1="160" y1="190" x2="252" y2="80" stroke="#7d6a2e" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.5"/>
+      <!-- Left cluster nodes -->
+      <circle cx="68" cy="80" r="18" fill="#141414" stroke="#3a3a3a" stroke-width="1.4"/>
+      <text x="68" y="77" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#888">GRUPY</text>
+      <text x="68" y="88" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#888">WSPARCIA</text>
+      <circle cx="48" cy="160" r="14" fill="#141414" stroke="#3a3a3a" stroke-width="1.3"/>
+      <text x="48" y="164" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#888">CHEMO</text>
+      <circle cx="88" cy="160" r="14" fill="#141414" stroke="#3a3a3a" stroke-width="1.3"/>
+      <text x="88" y="164" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#888">ROBERT</text>
+      <!-- Right cluster nodes -->
+      <circle cx="252" cy="80" r="18" fill="#1d1210" stroke="#7b2018" stroke-width="1.4"/>
+      <text x="252" y="77" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#b04030">FIGHT</text>
+      <text x="252" y="88" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#b04030">CLUB</text>
+      <circle cx="232" cy="160" r="14" fill="#141414" stroke="#7b2018" stroke-width="1.3"/>
+      <text x="232" y="164" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#888">RICKY</text>
+      <circle cx="272" cy="160" r="14" fill="#141414" stroke="#7b2018" stroke-width="1.3"/>
+      <text x="272" y="164" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#888">JILL</text>
+      <!-- BOB — the bridge, gold accent -->
+      <circle cx="160" cy="190" r="24" fill="#17140f" stroke="#c9a84c" stroke-width="2.5"/>
+      <text x="160" y="186" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="16" fill="#c9a84c" letter-spacing="0.06em">BOB</text>
+      <text x="160" y="201" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#7d6a2e">MOST</text>
+      <!-- labels -->
+      <text x="68" y="238" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#555" letter-spacing="0.1em">GRUPY WSPARCIA</text>
+      <text x="252" y="238" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8" fill="#555" letter-spacing="0.1em">FIGHT CLUB</text>
+      <!-- cut illustration -->
+      <text x="160" y="265" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#444" letter-spacing="0.12em">bez niego → sieć się rozpada</text>
+    </svg>
+  </div>
+</div>
+</section>
