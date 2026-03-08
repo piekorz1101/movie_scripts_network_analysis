@@ -1,0 +1,18 @@
+<section class="slide-concept">
+      <div class="tag gold">Pojęcie · Blok 2 — Degree</div>
+      <h2>Degree Centrality</h2>
+      <h3>Bezpośrednia aktywność węzła — nie władza, lecz obecność</h3>
+
+      <div class="def-box gold">
+        <strong>Ważona Centralność Stopnia:</strong><br/>
+        C<sub>D</sub>(v) = Σ<sub>u ∈ N(v)</sub> weight(v, u)<br/><br/>
+        Suma wag wszystkich krawędzi węzła v.<br/>
+        N(v) = zbiór bezpośrednich sąsiadów v.
+      </div>
+
+      <ul>
+        <li>Mierzy <em>intensywność bezpośrednich interakcji</em> — ile razy postać pojawia się w scenach z innymi</li>
+        <li>Wysoki degree ≠ kontrola — to <strong>ekspozycja i popularność</strong>, nie władza strukturalna</li>
+        <li>Normalizacja: C<sub>D</sub><sup>norm</sup>(v) = C<sub>D</sub>(v) / (|V|−1) ∈ [0, 1]</li>
+      </ul>
+    </section>

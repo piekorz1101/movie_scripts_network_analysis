@@ -1,0 +1,18 @@
+<section class="slide-concept">
+      <div class="tag gold">Pojęcie · Blok 7 — Mosty</div>
+      <h2>Structural Bridges</h2>
+      <h3>Krawędzie krytyczne — algorytm Tarjana</h3>
+
+      <div class="def-box gold">
+        <strong>Most (Bridge):</strong><br/>
+        Krawędź (u, v) jest mostem, jeśli jej usunięcie zwiększa liczbę spójnych składowych grafu.<br/><br/>
+        Wykrywanie: DFS z licznikami discovery[v] i low[v].<br/>
+        Warunek: low[v] &gt; discovery[u] → (u,v) jest mostem.
+      </div>
+
+      <ul>
+        <li>Mosty to <em>krawędzie krytyczne</em> — jedyne połączenia między składowymi sieci</li>
+        <li><strong>Cut vertex</strong> (punkt artykulacji): węzeł, którego usunięcie rozspójnia graf</li>
+        <li>Złożoność algorytmu Tarjana: O(V + E) — liniowa, skalowalna do dużych sieci</li>
+      </ul>
+    </section>

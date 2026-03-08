@@ -1,0 +1,360 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d0" for="edge" attr.name="weight" attr.type="long"/>
+<graph edgedefault="undirected"><node id="JULES"/>
+<node id="VINCENT"/>
+<node id="MIA"/>
+<node id="JIMMIE"/>
+<node id="THE WOLF"/>
+<node id="LANCE"/>
+<node id="BUTCH"/>
+<node id="FADE TO BLACK"/>
+<node id="HONEY BUNNY"/>
+<node id="PUMPKIN"/>
+<node id="JODY"/>
+<node id="ESMARELDA"/>
+<node id="MARVIN"/>
+<node id="ENGLISH DAVE"/>
+<node id="FABIENNE"/>
+<node id="MARSELLUS"/>
+<node id="MANAGER"/>
+<node id="WAITRESS"/>
+<node id="YOUNG MAN"/>
+<node id="YOUNG WOMAN"/>
+<node id="BRETT"/>
+<node id="ROGER"/>
+<node id="TRUDI"/>
+<node id="BUDDY"/>
+<node id="ED SULLIVAN"/>
+<node id="LANCE AND VINCENT"/>
+<node id="MOTHER"/>
+<node id="KLONDIKE"/>
+<node id="PEDESTRIAN"/>
+<node id="MAYNARD"/>
+<node id="THE GIMP"/>
+<node id="ZED"/>
+<node id="FOURTH MAN"/>
+<node id="RAQUEL"/>
+<node id="WINSTON"/>
+<node id="PATRON"/>
+<node id="FADE OUT"/>
+<node id="THE END"/>
+<node id="YOLANDA"/>
+<edge source="JULES" target="VINCENT">
+  <data key="d0">17</data>
+</edge>
+<edge source="JULES" target="JIMMIE">
+  <data key="d0">4</data>
+</edge>
+<edge source="JULES" target="THE WOLF">
+  <data key="d0">4</data>
+</edge>
+<edge source="JULES" target="MARVIN">
+  <data key="d0">2</data>
+</edge>
+<edge source="JULES" target="HONEY BUNNY">
+  <data key="d0">2</data>
+</edge>
+<edge source="JULES" target="MANAGER">
+  <data key="d0">2</data>
+</edge>
+<edge source="JULES" target="PUMPKIN">
+  <data key="d0">2</data>
+</edge>
+<edge source="JULES" target="BRETT">
+  <data key="d0">1</data>
+</edge>
+<edge source="JULES" target="BUTCH">
+  <data key="d0">1</data>
+</edge>
+<edge source="JULES" target="ROGER">
+  <data key="d0">1</data>
+</edge>
+<edge source="JULES" target="FOURTH MAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="JULES" target="MARSELLUS">
+  <data key="d0">1</data>
+</edge>
+<edge source="JULES" target="RAQUEL">
+  <data key="d0">1</data>
+</edge>
+<edge source="JULES" target="WINSTON">
+  <data key="d0">1</data>
+</edge>
+<edge source="JULES" target="PATRON">
+  <data key="d0">1</data>
+</edge>
+<edge source="JULES" target="FADE OUT">
+  <data key="d0">1</data>
+</edge>
+<edge source="JULES" target="THE END">
+  <data key="d0">1</data>
+</edge>
+<edge source="JULES" target="YOLANDA">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="MIA">
+  <data key="d0">9</data>
+</edge>
+<edge source="VINCENT" target="LANCE">
+  <data key="d0">5</data>
+</edge>
+<edge source="VINCENT" target="JODY">
+  <data key="d0">3</data>
+</edge>
+<edge source="VINCENT" target="THE WOLF">
+  <data key="d0">3</data>
+</edge>
+<edge source="VINCENT" target="BUTCH">
+  <data key="d0">2</data>
+</edge>
+<edge source="VINCENT" target="MARVIN">
+  <data key="d0">2</data>
+</edge>
+<edge source="VINCENT" target="ENGLISH DAVE">
+  <data key="d0">2</data>
+</edge>
+<edge source="VINCENT" target="JIMMIE">
+  <data key="d0">2</data>
+</edge>
+<edge source="VINCENT" target="HONEY BUNNY">
+  <data key="d0">2</data>
+</edge>
+<edge source="VINCENT" target="MANAGER">
+  <data key="d0">2</data>
+</edge>
+<edge source="VINCENT" target="PUMPKIN">
+  <data key="d0">2</data>
+</edge>
+<edge source="VINCENT" target="BRETT">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="ROGER">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="TRUDI">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="BUDDY">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="ED SULLIVAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="LANCE AND VINCENT">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="FADE TO BLACK">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="MOTHER">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="FOURTH MAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="RAQUEL">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="WINSTON">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="PATRON">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="FADE OUT">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="THE END">
+  <data key="d0">1</data>
+</edge>
+<edge source="VINCENT" target="YOLANDA">
+  <data key="d0">1</data>
+</edge>
+<edge source="MIA" target="BUDDY">
+  <data key="d0">1</data>
+</edge>
+<edge source="MIA" target="ED SULLIVAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="MIA" target="JODY">
+  <data key="d0">1</data>
+</edge>
+<edge source="MIA" target="LANCE">
+  <data key="d0">1</data>
+</edge>
+<edge source="MIA" target="FADE TO BLACK">
+  <data key="d0">1</data>
+</edge>
+<edge source="MIA" target="MOTHER">
+  <data key="d0">1</data>
+</edge>
+<edge source="MIA" target="ENGLISH DAVE">
+  <data key="d0">1</data>
+</edge>
+<edge source="JIMMIE" target="THE WOLF">
+  <data key="d0">6</data>
+</edge>
+<edge source="LANCE" target="JODY">
+  <data key="d0">2</data>
+</edge>
+<edge source="LANCE" target="LANCE AND VINCENT">
+  <data key="d0">1</data>
+</edge>
+<edge source="BUTCH" target="FADE TO BLACK">
+  <data key="d0">4</data>
+</edge>
+<edge source="BUTCH" target="ESMARELDA">
+  <data key="d0">3</data>
+</edge>
+<edge source="BUTCH" target="FABIENNE">
+  <data key="d0">2</data>
+</edge>
+<edge source="BUTCH" target="MARSELLUS">
+  <data key="d0">2</data>
+</edge>
+<edge source="BUTCH" target="BRETT">
+  <data key="d0">1</data>
+</edge>
+<edge source="BUTCH" target="MARVIN">
+  <data key="d0">1</data>
+</edge>
+<edge source="BUTCH" target="ROGER">
+  <data key="d0">1</data>
+</edge>
+<edge source="BUTCH" target="ENGLISH DAVE">
+  <data key="d0">1</data>
+</edge>
+<edge source="BUTCH" target="KLONDIKE">
+  <data key="d0">1</data>
+</edge>
+<edge source="BUTCH" target="PEDESTRIAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="BUTCH" target="MAYNARD">
+  <data key="d0">1</data>
+</edge>
+<edge source="FADE TO BLACK" target="FABIENNE">
+  <data key="d0">2</data>
+</edge>
+<edge source="FADE TO BLACK" target="MOTHER">
+  <data key="d0">1</data>
+</edge>
+<edge source="FADE TO BLACK" target="KLONDIKE">
+  <data key="d0">1</data>
+</edge>
+<edge source="FADE TO BLACK" target="MAYNARD">
+  <data key="d0">1</data>
+</edge>
+<edge source="HONEY BUNNY" target="PUMPKIN">
+  <data key="d0">3</data>
+</edge>
+<edge source="HONEY BUNNY" target="MANAGER">
+  <data key="d0">2</data>
+</edge>
+<edge source="HONEY BUNNY" target="WAITRESS">
+  <data key="d0">1</data>
+</edge>
+<edge source="HONEY BUNNY" target="YOUNG MAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="HONEY BUNNY" target="YOUNG WOMAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="HONEY BUNNY" target="PATRON">
+  <data key="d0">1</data>
+</edge>
+<edge source="HONEY BUNNY" target="FADE OUT">
+  <data key="d0">1</data>
+</edge>
+<edge source="HONEY BUNNY" target="THE END">
+  <data key="d0">1</data>
+</edge>
+<edge source="HONEY BUNNY" target="YOLANDA">
+  <data key="d0">1</data>
+</edge>
+<edge source="PUMPKIN" target="MANAGER">
+  <data key="d0">2</data>
+</edge>
+<edge source="PUMPKIN" target="WAITRESS">
+  <data key="d0">1</data>
+</edge>
+<edge source="PUMPKIN" target="YOUNG MAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="PUMPKIN" target="YOUNG WOMAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="PUMPKIN" target="PATRON">
+  <data key="d0">1</data>
+</edge>
+<edge source="PUMPKIN" target="FADE OUT">
+  <data key="d0">1</data>
+</edge>
+<edge source="PUMPKIN" target="THE END">
+  <data key="d0">1</data>
+</edge>
+<edge source="PUMPKIN" target="YOLANDA">
+  <data key="d0">1</data>
+</edge>
+<edge source="JODY" target="TRUDI">
+  <data key="d0">1</data>
+</edge>
+<edge source="JODY" target="LANCE AND VINCENT">
+  <data key="d0">1</data>
+</edge>
+<edge source="MARVIN" target="BRETT">
+  <data key="d0">1</data>
+</edge>
+<edge source="MARVIN" target="ROGER">
+  <data key="d0">1</data>
+</edge>
+<edge source="MARSELLUS" target="PEDESTRIAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="MANAGER" target="PATRON">
+  <data key="d0">1</data>
+</edge>
+<edge source="MANAGER" target="FADE OUT">
+  <data key="d0">1</data>
+</edge>
+<edge source="MANAGER" target="THE END">
+  <data key="d0">1</data>
+</edge>
+<edge source="MANAGER" target="YOLANDA">
+  <data key="d0">1</data>
+</edge>
+<edge source="WAITRESS" target="YOUNG MAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="WAITRESS" target="YOUNG WOMAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="YOUNG MAN" target="YOUNG WOMAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="BRETT" target="ROGER">
+  <data key="d0">1</data>
+</edge>
+<edge source="MAYNARD" target="THE GIMP">
+  <data key="d0">1</data>
+</edge>
+<edge source="MAYNARD" target="ZED">
+  <data key="d0">1</data>
+</edge>
+<edge source="THE GIMP" target="ZED">
+  <data key="d0">1</data>
+</edge>
+<edge source="RAQUEL" target="WINSTON">
+  <data key="d0">1</data>
+</edge>
+<edge source="FADE OUT" target="THE END">
+  <data key="d0">1</data>
+</edge>
+<edge source="FADE OUT" target="YOLANDA">
+  <data key="d0">1</data>
+</edge>
+<edge source="THE END" target="YOLANDA">
+  <data key="d0">1</data>
+</edge>
+</graph></graphml>

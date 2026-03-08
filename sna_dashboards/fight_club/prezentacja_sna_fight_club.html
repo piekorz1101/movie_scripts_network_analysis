@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analiza Sieci Postaci — Fight Club</title>
+
+  <!-- Reveal.js CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reset.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Paleta Fight Club ── */
+    :root {
+      --black:   #0a0a0a;
+      --dark:    #111111;
+      --surface: #1a1a1a;
+      --border:  #2a2a2a;
+      --red:     #c0392b;
+      --red-dim: #7b2018;
+      --gold:    #c9a84c;
+      --gold-dim:#7d6a2e;
+      --white:   #e8e8e8;
+      --muted:   #888888;
+      --mono:    'Share Tech Mono', monospace;
+      --display: 'Bebas Neue', sans-serif;
+      --body:    'Inter', sans-serif;
+    }
+
+    .reveal-viewport { background: var(--black); }
+
+    .reveal {
+      font-family: var(--body);
+      font-size: 1.6rem;
+      color: var(--white);
+    }
+
+    /* ── Slide base ── */
+    .reveal .slides section {
+      height: 100%;
+      text-align: left;
+      padding: 0 3rem;
+      box-sizing: border-box;
+    }
+
+    /* ── Slide type accent borders ── */
+    .reveal .slides section.slide-concept {
+      border-left: 4px solid var(--gold);
+    }
+    .reveal .slides section.slide-data {
+      border-left: 4px solid #555;
+    }
+    .reveal .slides section.slide-interpretation {
+      border-left: 4px solid var(--red);
+    }
+
+    /* ── Typography ── */
+    .reveal h1 {
+      font-family: var(--display);
+      font-size: 3.8rem;
+      letter-spacing: 0.12em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 0.2em;
+      line-height: 1.05;
+    }
+
+    .reveal h2 {
+      font-family: var(--display);
+      font-size: 2.6rem;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 0.6em;
+      line-height: 1.1;
+    }
+
+    .reveal h3 {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.6rem;
+    }
+
+    .reveal p { margin: 0 0 0.6em; line-height: 1.55; }
+
+    .reveal ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .reveal ul li {
+      padding: 0.45em 0 0.45em 1.6em;
+      position: relative;
+      line-height: 1.5;
+      border-bottom: 1px solid var(--border);
+      font-size: 1rem;
+    }
+
+    .reveal ul li:last-child { border-bottom: none; }
+
+    .reveal ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--red);
+      font-size: 0.85em;
+      top: 0.55em;
+    }
+
+    /* ── Accent elements ── */
+    .tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.25em 0.75em;
+      border: 1px solid var(--red-dim);
+      color: var(--red);
+      border-radius: 2px;
+      margin-bottom: 1rem;
+    }
+
+    .tag.gold { border-color: var(--gold-dim); color: var(--gold); }
+    .tag.grey { border-color: #444; color: #999; }
+
+    .def-box {
+      background: var(--surface);
+      border-left: 3px solid var(--red);
+      padding: 0.9em 1.2em;
+      margin: 0.8em 0 1.2em;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .def-box.gold { border-color: var(--gold); }
+
+    em { color: var(--gold); font-style: normal; font-weight: 600; }
+    strong { color: var(--red); font-weight: 600; }
+
+    /* ── Formula ── */
+    .formula {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      color: var(--gold);
+      background: #0f0f0f;
+      border: 1px solid var(--border);
+      padding: 0.6em 1em;
+      display: inline-block;
+      margin: 0.5em 0 1em;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Data table ── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      margin: 1em 0;
+    }
+    .data-table th {
+      text-align: left;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      padding: 0.4em 0.8em;
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table td {
+      padding: 0.5em 0.8em;
+      border-bottom: 1px solid var(--border);
+      color: var(--white);
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table .val { color: var(--gold); font-weight: 600; }
+    .data-table .bar {
+      display: inline-block;
+      height: 8px;
+      background: var(--red-dim);
+      border-radius: 2px;
+      vertical-align: middle;
+      margin-left: 0.5em;
+    }
+    .data-table .bar.highlight { background: var(--red); }
+
+    /* ── ASCII diagram ── */
+    .ascii-diagram {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: #bbb;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      padding: 1em 1.4em;
+      line-height: 1.8;
+      margin: 1em 0;
+      letter-spacing: 0.02em;
+    }
+    .ascii-diagram .node { color: var(--gold); }
+    .ascii-diagram .node-red { color: var(--red); }
+
+    /* ── Community badges ── */
+    .community-list { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
+
+    .community-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .c-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 0.3em;
+    }
+
+    .c-name { font-family: var(--mono); font-weight: 600; margin-right: 0.4em; }
+    .c-count {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-left: 0.3em;
+    }
+
+    /* ── Slide 1 — title ── */
+    .title-slide {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .title-slide .eyebrow {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .title-slide h1 { font-size: 5.5rem; line-height: 0.95; }
+    .title-slide .subtitle {
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      color: var(--gold);
+      margin-top: 1.2rem;
+      letter-spacing: 0.1em;
+    }
+    .title-slide .meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 3rem;
+      font-family: var(--mono);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Anomaly node highlight ── */
+    .node-highlight {
+      font-family: var(--mono);
+      font-size: 1.3rem;
+      color: var(--red);
+      border: 1px solid var(--red-dim);
+      display: inline-block;
+      padding: 0.4em 0.9em;
+      margin: 0.8em 0;
+      background: rgba(192, 57, 43, 0.07);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Further research grid ── */
+    .research-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-top: 0.8rem;
+    }
+
+    .research-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.75em 1em;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .research-item .r-num {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--red);
+      letter-spacing: 0.15em;
+      display: block;
+      margin-bottom: 0.3em;
+    }
+
+    /* ── iframe slide ── */
+    .iframe-slide {
+      padding: 0 !important;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .iframe-header {
+      font-family: var(--display);
+      font-size: 1.6rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      text-transform: uppercase;
+      padding: 0.5rem 2rem;
+      background: var(--dark);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    .iframe-header .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+      display: inline-block;
+    }
+
+    .iframe-slide iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: var(--black);
+    }
+
+    /* ── Density visual ── */
+    .density-compare {
+      display: flex;
+      gap: 2rem;
+      margin: 1em 0;
+      align-items: flex-start;
+    }
+
+    .density-box {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1em;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+    }
+
+    .density-box svg {
+      display: block;
+      margin: 0.5em auto;
+    }
+
+    .density-box .d-label {
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.68rem;
+    }
+    .density-box .d-val {
+      color: var(--gold);
+      font-size: 1rem;
+      display: block;
+      margin-top: 0.3em;
+    }
+
+    /* ── Slide number ── */
+    .reveal .slide-number {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    /* ── Progress bar ── */
+    .reveal .progress { background: var(--border); }
+    .reveal .progress span { background: var(--red); }
+
+    /* ── Controls ── */
+    .reveal .controls button { color: var(--red); }
+
+    /* ── Fragment animations ── */
+    .reveal .fragment { opacity: 0.2; }
+    .reveal .fragment.visible { opacity: 1; }
+
+    /* ── Noise texture overlay ── */
+    .reveal .slides::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOK 0 — Wstęp
+    ═══════════════════════════════════════════════════════════ -->
+
+    <!-- SLAJD 1 — Tytuł -->
+    <section>
+      <div class="title-slide">
+        <div class="eyebrow">Humanistyka Cyfrowa · Analiza Sieci Społecznych</div>
+        <h1>Fight Club<br/>jako Graf</h1>
+        <div class="subtitle">Struktury władzy, paradoksy tożsamości<br/>i pęknięcia narracyjne w ujęciu SNA</div>
+        <div class="meta">22 slajdy · Podejście: pojęcie → dane → interpretacja</div>
+      </div>
+    </section>
+
+    <!-- SLAJD 2 — Pojęcie: SNA / graf -->
+    <section class="slide-concept">
+      <div class="tag gold">Pojęcie · Blok 0</div>
+      <h2>Czym jest sieć postaci?</h2>
+      <h3>Social Network Analysis · G = (V, E)</h3>
+
+      <div class="def-box gold">
+        <strong>Graf postaci:</strong> G = (V, E, w)<br/>
+        V = zbiór węzłów (unikalne postacie scenariusza)<br/>
+        E = zbiór krawędzi (pary postaci współwystępujące w tej samej scenie)<br/>
+        w: E → ℕ = waga = liczba wspólnych scen
+      </div>
+
+      <ul>
+        <li>Węzeł identyfikowany przez nagłówek postaci w didaskaliach (np. <em>JACK</em>, <em>TYLER</em>)</li>
+        <li>Graf <strong>nieukierunkowany</strong> i <em>ważony</em> — relacja jest symetryczna, waga mierzy intensywność</li>
+        <li>Fight Club: <em>49 węzłów</em> (postaci), <em>116 krawędzi</em> (relacji)</li>
+        <li>Najsilniejsza krawędź: <em>JACK–TYLER</em> (waga 40) — spotkanie w niemal każdej scenie</li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOK 1 — Gęstość
+    ═══════════════════════════════════════════════════════════ -->
+
+    <!-- SLAJD 3 — Pojęcie: Density -->
+    <section class="slide-concept">
+      <div class="tag gold">Pojęcie · Blok 1 — Gęstość</div>
+      <h2>Density — gęstość sieci</h2>
+      <h3>Ile relacji istnieje spośród wszystkich możliwych?</h3>
+
+      <div class="def-box gold">
+        <strong>Gęstość (Density):</strong><br/>
+        D = 2|E| / (|V| · (|V| − 1))<br/><br/>
+        Stosunek rzeczywistych krawędzi do wszystkich możliwych połączeń w grafie prostym.<br/>
+        Zakres: D ∈ [0, 1]
+      </div>
+
+      <ul>
+        <li>D → 0: sieć <em>rzadka</em> — większość par postaci nigdy się nie spotyka</li>
+        <li>D → 1: sieć <em>gęsta</em> — niemal wszyscy znają wszystkich (klika)</li>
+        <li>Sieci narracyjne są typowo rzadkie: postacie żyją w swoich mikroświatach</li>
+      </ul>
+    </section>
+
+    <!-- SLAJD 4 — Dane: Density Fight Club -->
+    <section class="slide-data">
+      <div class="tag grey">Dane · Blok 1 — Gęstość</div>
+      <h2>D(Fight Club) ≈ 0.099</h2>
+      <h3>Rzadka sieć vs. gęsta klika — porównanie wizualne</h3>
+
+      <div class="density-compare">
+        <div class="density-box">
+          <div class="d-label">Sieć gęsta (klika)</div>
+          <svg width="120" height="80" viewBox="0 0 120 80">
+            <line x1="20" y1="20" x2="60" y2="10" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/>
+            <line x1="20" y1="20" x2="100" y2="20" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/>
+            <line x1="20" y1="20" x2="60" y2="70" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/>
+            <line x1="60" y1="10" x2="100" y2="20" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/>
+            <line x1="60" y1="10" x2="60" y2="70" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/>
+            <line x1="100" y1="20" x2="60" y2="70" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/>
+            <circle cx="20" cy="20" r="5" fill="#c9a84c"/>
+            <circle cx="60" cy="10" r="5" fill="#c9a84c"/>
+            <circle cx="100" cy="20" r="5" fill="#c9a84c"/>
+            <circle cx="60" cy="70" r="5" fill="#c9a84c"/>
+          </svg>
+          <span class="d-val">D ≈ 1.0</span>
+        </div>
+        <div class="density-box">
+          <div class="d-label">Fight Club (D ≈ 0.099)</div>
+          <svg width="120" height="80" viewBox="0 0 120 80">
+            <line x1="60" y1="40" x2="20" y2="15" stroke="#c0392b" stroke-width="2" opacity="0.9"/>
+            <line x1="60" y1="40" x2="100" y2="15" stroke="#c0392b" stroke-width="1.5" opacity="0.7"/>
+            <line x1="60" y1="40" x2="60" y2="70" stroke="#c0392b" stroke-width="1" opacity="0.5"/>
+            <circle cx="60" cy="40" r="7" fill="#c0392b"/>
+            <circle cx="20" cy="15" r="4" fill="#888"/>
+            <circle cx="100" cy="15" r="4" fill="#888"/>
+            <circle cx="60" cy="70" r="4" fill="#888"/>
+            <circle cx="20" cy="65" r="3" fill="#555"/>
+            <circle cx="100" cy="65" r="3" fill="#555"/>
+          </svg>
+          <span class="d-val">D ≈ 0.099</span>
+        </div>
+        <div class="density-box">
+          <div class="d-label">Sieć rzadka (gwiazda)</div>
+          <svg width="120" height="80" viewBox="0 0 120 80">
+            <line x1="60" y1="40" x2="20" y2="15" stroke="#555" stroke-width="1" opacity="0.6"/>
+            <line x1="60" y1="40" x2="100" y2="15" stroke="#555" stroke-width="1" opacity="0.6"/>
+            <line x1="60" y1="40" x2="20" y2="65" stroke="#555" stroke-width="1" opacity="0.6"/>
+            <line x1="60" y1="40" x2="100" y2="65" stroke="#555" stroke-width="1" opacity="0.6"/>
+            <line x1="60" y1="40" x2="60" y2="5" stroke="#555" stroke-width="1" opacity="0.6"/>
+            <circle cx="60" cy="40" r="6" fill="#888"/>
+            <circle cx="20" cy="15" r="3" fill="#444"/>
+            <circle cx="100" cy="15" r="3" fill="#444"/>
+            <circle cx="20" cy="65" r="3" fill="#444"/>
+            <circle cx="100" cy="65" r="3" fill="#444"/>
+            <circle cx="60" cy="5" r="3" fill="#444"/>
+          </svg>
+          <span class="d-val">D → 0</span>
+        </div>
+      </div>
+
+      <p style="font-family:var(--mono); font-size:0.8rem; color:var(--muted); margin-top:0.5em">
+        116 krawędzi z 49·48/2 = 1176 możliwych. Tylko 9.9% relacji istnieje.
+      </p>
+    </section>
+
+    <!-- SLAJD 5 — Interpretacja: Narcystyczna apokalipsa -->
+    <section class="slide-interpretation">
+      <div class="tag">Interpretacja · Blok 1 — Gęstość</div>
+      <h2>Narcystyczna Apokalipsa</h2>
+      <h3>Ego-sieć jako architektura narracji subiektywnej</h3>
+
+      <ul>
+        <li>Niska globalna gęstość (0.099) przy bardzo wysokiej lokalnej koncentracji wokół Jacka — <em>gwiaździsta ego-sieć</em></li>
+        <li>Świat Fight Clubu <strong>dosłownie nie istnieje bez Narratora</strong>: usunięcie Jacka rozpada sieć na izolowane wyspy bez wzajemnych połączeń</li>
+        <li>Kamera (i graf) nigdy nie wychodzą poza perspektywę Jacka — SNA <em>potwierdza subiektywizm formalny</em> scenariusza</li>
+        <li>Barabási: sieci narracyjne wykazują właściwości <strong>scale-free</strong> — niewielu hubów kontroluje przepływ całości. Jeden hub = jeden punkt widzenia</li>
+        <li>Brak centrum = <em>rozpad na izolowane wyspy</em> — jeśli Jack śpi, świat nie istnieje</li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOK 2 — Degree Centrality
+    ═══════════════════════════════════════════════════════════ -->
+
+    <!-- SLAJD 6 — Pojęcie: Degree Centrality -->
+    <section class="slide-concept">
+      <div class="tag gold">Pojęcie · Blok 2 — Degree</div>
+      <h2>Degree Centrality</h2>
+      <h3>Bezpośrednia aktywność węzła — nie władza, lecz obecność</h3>
+
+      <div class="def-box gold">
+        <strong>Ważona Centralność Stopnia:</strong><br/>
+        C<sub>D</sub>(v) = Σ<sub>u ∈ N(v)</sub> weight(v, u)<br/><br/>
+        Suma wag wszystkich krawędzi węzła v.<br/>
+        N(v) = zbiór bezpośrednich sąsiadów v.
+      </div>
+
+      <ul>
+        <li>Mierzy <em>intensywność bezpośrednich interakcji</em> — ile razy postać pojawia się w scenach z innymi</li>
+        <li>Wysoki degree ≠ kontrola — to <strong>ekspozycja i popularność</strong>, nie władza strukturalna</li>
+        <li>Normalizacja: C<sub>D</sub><sup>norm</sup>(v) = C<sub>D</sub>(v) / (|V|−1) ∈ [0, 1]</li>
+      </ul>
+    </section>
+
+    <!-- SLAJD 7 — Dane: Degree ranking -->
+    <section class="slide-data">
+      <div class="tag grey">Dane · Blok 2 — Degree</div>
+      <h2>Ranking postaci: ważony stopień</h2>
+      <h3>Dysproporcja ×1.7 między Jackiem a Tylerem</h3>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Postać</th>
+            <th>Degree (suma wag)</th>
+            <th>Proporcja do JACK</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>JACK</strong></td>
+            <td class="val">109</td>
+            <td class="val">1.00 ×</td>
+            <td><span class="bar highlight" style="width:120px"></span></td>
+          </tr>
+          <tr>
+            <td><em>TYLER</em></td>
+            <td class="val">64</td>
+            <td>0.59 ×</td>
+            <td><span class="bar" style="width:70px"></span></td>
+          </tr>
+          <tr>
+            <td>MARLA</td>
+            <td class="val">35</td>
+            <td>0.32 ×</td>
+            <td><span class="bar" style="width:38px"></span></td>
+          </tr>
+          <tr>
+            <td>BOB</td>
+            <td class="val">12</td>
+            <td>0.11 ×</td>
+            <td><span class="bar" style="width:13px"></span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted)">pozostałe 45 postaci</td>
+            <td style="color:var(--muted)">2–8</td>
+            <td style="color:var(--muted)">≤ 0.07 ×</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="font-family:var(--mono); font-size:0.8rem; color:var(--muted)">
+        Najsilniejsza krawędź: JACK–TYLER = 40 · Druga: JACK–MARLA = 19
+      </p>
+    </section>
+
+    <!-- SLAJD 8 — Interpretacja: SPOF -->
+    <section class="slide-interpretation">
+      <div class="tag">Interpretacja · Blok 2 — Degree</div>
+      <h2>Jack jako SPOF</h2>
+      <h3>Single Point of Failure — narracja jako monolog</h3>
+
+      <ul>
+        <li>Degree Jacka (109) jest <em>1.7× wyższy niż Tylera</em> — przepaść strukturalna, nie tylko fabularna</li>
+        <li>Jack to <strong>hub grawitacyjny</strong>: inni aktorzy orbitują wokół niego, rzadko wchodząc ze sobą w niezależne interakcje</li>
+        <li>Usunięcie węzła Jacka <em>rozsadziłoby sieć</em> na wiele składowych — Single Point of Failure całego świata przedstawionego</li>
+        <li>SNA potwierdza formalny subiektywizm: <strong>kamera nigdy nie opuszcza jego perspektywy</strong> — i graf też nie</li>
+        <li>Dysproporcja JACK vs BOB (109 vs 12): Bob jest człowiekiem, Jack jest <em>zasadą narracyjną</em></li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOK 3 — Betweenness Centrality
+    ═══════════════════════════════════════════════════════════ -->
+
+    <!-- SLAJD 9 — Pojęcie: Betweenness -->
+    <section class="slide-concept">
+      <div class="tag gold">Pojęcie · Blok 3 — Betweenness</div>
+      <h2>Betweenness Centrality</h2>
+      <h3>Kto kontroluje przepływ — broker, nie gwiazda</h3>
+
+      <div class="def-box gold">
+        <strong>Centralność Pośrednictwa:</strong><br/>
+        C<sub>B</sub>(v) = Σ<sub>s≠v≠t</sub> σ(s,t|v) / σ(s,t)<br/><br/>
+        σ(s,t) = liczba najkrótszych ścieżek między s i t<br/>
+        σ(s,t|v) = spośród nich te, które przechodzą przez v
+      </div>
+
+      <ul>
+        <li>Mierzy, jak często węzeł jest <em>mostem</em> na najkrótszych ścieżkach między innymi parami</li>
+        <li>Wysokie betweenness = <strong>broker informacyjny</strong> — kontrola przepływu, nie tylko popularność</li>
+        <li>Algorytm Brandesa (BFS/Dijkstra), złożoność O(VE)</li>
+        <li>Węzeł z niskim degree może mieć wysokie betweenness — <em>wąskie gardło</em> sieci</li>
+      </ul>
+    </section>
+
+    <!-- SLAJD 10 — Dane: Schemat Tyler jako broker -->
+    <section class="slide-data">
+      <div class="tag grey">Dane · Blok 3 — Betweenness</div>
+      <h2>Tyler jako wąskie gardło</h2>
+      <h3>Bez Tylera — brak ścieżki do podziemia</h3>
+
+      <div class="ascii-diagram">
+<span class="node">GRUPY WSPARCIA</span>          <span class="node">SPACE MONKEYS</span>
+  BOB ──────── <span class="node-red">JACK</span> ──────── <span class="node-red">TYLER</span> ──── ANGEL FACE
+                  │                    │
+               MARLA              RICKY, BOBB...
+                  │
+            (zewnętrzna rzeczywistość)
+
+  Usuń TYLER → brak ścieżki: JACK ↛ SPACE MONKEYS
+  Usuń JACK  → brak ścieżki: MARLA ↛ wszystko
+      </div>
+
+      <ul>
+        <li>Tyler łączy <em>hermetyczny rój</em> Project Mayhem z narracją Jacka</li>
+        <li>Bez węzła Tyler: Space Monkeys stają się osobną składową — <strong>niedostępną dla Narratora</strong></li>
+        <li>Betweenness Tylera wyższe niż jego degree sugeruje: jest <em>brokerem</em>, nie tylko aktorem</li>
+      </ul>
+    </section>
+
+    <!-- SLAJD 11 — Interpretacja: Paradoks Tylera -->
+    <section class="slide-interpretation">
+      <div class="tag">Interpretacja · Blok 3 — Betweenness</div>
+      <h2>Paradoks Tylera Durdena</h2>
+      <h3>Alter ego z realną władzą strukturalną</h3>
+
+      <ul>
+        <li>Tyler jest ontologicznie fikcją — <em>dysocjacyjnym alter ego</em> Jacka, które nie istnieje poza jego psychozą</li>
+        <li>W grafie: <strong>pełnoprawny hub z wysokim betweenness</strong> — łączy Jacka z podziemiem Project Mayhem</li>
+        <li>Burt (2004): Tyler zajmuje pozycję <em>brokera w dziurze strukturalnej</em> — jedyny pomost między dwiema klikami, które inaczej by się nie komunikowały</li>
+        <li><strong>Fikcja wewnątrz fikcji</strong> ma realną władzę strukturalną nad siecią — SNA nie odróżnia wyobraźni od rzeczywistości</li>
+        <li>Paradoks narracyjny jako paradoks grafowy: <em>węzeł bez ontologii, z maksymalnym betweenness</em></li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOK 4 — Closeness Centrality
+    ═══════════════════════════════════════════════════════════ -->
+
+    <!-- SLAJD 12 — Pojęcie: Closeness -->
+    <section class="slide-concept">
+      <div class="tag gold">Pojęcie · Blok 4 — Closeness</div>
+      <h2>Closeness Centrality</h2>
+      <h3>Sprawność komunikacyjna — kto jest blisko wszystkich?</h3>
+
+      <div class="def-box gold">
+        <strong>Centralność Bliskości:</strong><br/>
+        C<sub>C</sub>(v) = (n − 1) / Σ<sub>u≠v</sub> d(v, u)<br/><br/>
+        d(v, u) = odległość geodezyczna (długość najkrótszej ścieżki)<br/>
+        n = liczba węzłów w spójnej składowej
+      </div>
+
+      <ul>
+        <li>Odwrotność <em>średniej odległości</em> węzła do wszystkich pozostałych</li>
+        <li>Wysoka bliskość → informacja z tego węzła <strong>dociera szybko do całej sieci</strong></li>
+        <li>Kluczowa różnica: węzeł może mieć niski degree ale wysokie closeness — <em>skróty przez strukturę</em></li>
+      </ul>
+    </section>
+
+    <!-- SLAJD 13 — Interpretacja: Marla Singer -->
+    <section class="slide-interpretation">
+      <div class="tag">Interpretacja · Blok 4 — Closeness</div>
+      <h2>Marla — kotwica rzeczywistości</h2>
+      <h3>Wysoka bliskość, niski stopień — anomalia narracyjna</h3>
+
+      <ul>
+        <li>Marla osiąga <em>wysoką closeness</em> mimo niskiego degree — pojawia się w kluczowych węzłach sieci, nie w każdej scenie</li>
+        <li>Jej obecność w trzech różnych klastrach (grupy wsparcia, fight club, mieszkanie Tylera) sprawia, że <strong>skraca dystans między wszystkimi</strong></li>
+        <li>Jest jedyną postacią, która <em>konfrontuje Jacka z zewnętrzną rzeczywistością</em> — dosłownie zbliża go do prawdy</li>
+        <li>Narracyjny termometr: <strong>im wyższe closeness Marli w danej scenie → im bliżej Jack jest przebudzenia</strong></li>
+        <li>SNA wychwytuje to, co intuicja czytelnika wyczuwa: Marla to <em>grawitacyjny kotwor</em>, nie postać drugoplanowa</li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOK 5 — Community Detection
+    ═══════════════════════════════════════════════════════════ -->
+
+    <!-- SLAJD 14 — Pojęcie: Modularity / Louvain -->
+    <section class="slide-concept">
+      <div class="tag gold">Pojęcie · Blok 5 — Społeczności</div>
+      <h2>Modularity &amp; Community Detection</h2>
+      <h3>Algorytm Louvain — iteracyjna maksymalizacja Q</h3>
+
+      <div class="def-box gold">
+        <strong>Modularność Q:</strong><br/>
+        Q = Σ<sub>c</sub> [ L<sub>c</sub>/m − (d<sub>c</sub>/2m)² ]<br/><br/>
+        L<sub>c</sub> = krawędzie wewnątrz społeczności c<br/>
+        m = wszystkie krawędzie · d<sub>c</sub> = suma stopni w c<br/>
+        Q ∈ [−1, 1]; Q &gt; 0.3 = wyraźna struktura
+      </div>
+
+      <ul>
+        <li>Społeczność = skupisko węzłów o <em>gęstszych wewnętrznych</em> niż zewnętrznych połączeniach</li>
+        <li>Louvain: iteracyjnie przesuwa węzły między społecznościami, aż Q jest maksymalne</li>
+        <li>Wysoka modularność = <strong>wyraźnie odrębne grupy</strong>, mało mostów między nimi</li>
+      </ul>
+    </section>
+
+    <!-- SLAJD 15 — Dane: 4 społeczności -->
+    <section class="slide-data">
+      <div class="tag grey">Dane · Blok 5 — Społeczności</div>
+      <h2>4 skupiska w Fight Club</h2>
+      <h3>Louvain Q &gt; 0.3 — wyraźna struktura modułowa</h3>
+
+      <div class="community-list">
+        <div class="community-item">
+          <div class="c-dot" style="background:#c0392b"></div>
+          <div>
+            <span class="c-name">Triada Władzy</span><span class="c-count">[3 węzły]</span>
+            — JACK, TYLER, MARLA. Rdzeń fabularny. Maksymalna wzajemna gęstość, najcięższe krawędzie (40+19).
+          </div>
+        </div>
+        <div class="community-item">
+          <div class="c-dot" style="background:#c9a84c"></div>
+          <div>
+            <span class="c-name">Space Monkeys</span><span class="c-count">[~8 węzłów]</span>
+            — Project Mayhem. Angel Face, Ricky, pozostałe mięso armatnie. Hermetyczny rój bez twarzy, najwyższy clustering coefficient.
+          </div>
+        </div>
+        <div class="community-item">
+          <div class="c-dot" style="background:#3498db"></div>
+          <div>
+            <span class="c-name">Grupy Wsparcia</span><span class="c-count">[~5 węzłów]</span>
+            — Bob, uczestnicy grup chorych. Przestrzeń słabości, niska gęstość, relacje afektywne. Jedyny Bob jako most do Fight Clubu.
+          </div>
+        </div>
+        <div class="community-item">
+          <div class="c-dot" style="background:#7f8c8d"></div>
+          <div>
+            <span class="c-name">Aparat Państwa</span><span class="c-count">[~5 węzłów]</span>
+            — detektywi, psychiatra. Wchodzą w sieć późno. Antagoniści strukturalni: niska waga krawędzi, marginalny degree.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLAJD 16 — Interpretacja: 4 tożsamości Jacka -->
+    <section class="slide-interpretation">
+      <div class="tag">Interpretacja · Blok 5 — Społeczności</div>
+      <h2>Każda społeczność = odrębna tożsamość</h2>
+      <h3>Fragmentacja ego jako fragmentacja grafu</h3>
+
+      <ul>
+        <li>Cztery skupiska to cztery tryby istnienia Jacka — <em>każdy klaster jest innym Jackiem</em>: wrażliwym, destrukcyjnym, zdysocjowanym, ściganym</li>
+        <li>Jack pojawia się w każdej społeczności: to on <strong>łączy cztery tożsamości</strong> — bez niego byłyby osobnymi światami</li>
+        <li>Space Monkeys = <em>rój bez twarzy</em>: Tyler celowo projektuje ich anonimowość — żaden węzeł nie ma własnej narracji</li>
+        <li>Aparat Państwa wchodzi <strong>późno i słabo</strong> — dla Jacka rzeczywistość zewnętrzna jest marginalnym szumem, dopóki nie jest za późno</li>
+        <li>Grupy Wsparcia: jedyne miejsce, gdzie Jack ma <em>prawdziwe emocje</em> — graf to potwierdza: niski degree, ale autentyczna relacja z Bobem</li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOK 6 — Clustering Coefficient
+    ═══════════════════════════════════════════════════════════ -->
+
+    <!-- SLAJD 17 — Pojęcie: CC -->
+    <section class="slide-concept">
+      <div class="tag gold">Pojęcie · Blok 6 — Clustering</div>
+      <h2>Clustering Coefficient</h2>
+      <h3>Hermetyczność środowiska — klika vs broker</h3>
+
+      <div class="def-box gold">
+        <strong>Lokalny Współczynnik Klasteryzacji:</strong><br/>
+        CC(v) = 2T(v) / (k(v) · (k(v) − 1))<br/><br/>
+        T(v) = liczba trójkątów zamkniętych przy węźle v<br/>
+        k(v) = liczba sąsiadów (degree nieważony)
+      </div>
+
+      <ul>
+        <li>CC(v) ∈ [0, 1]. CC = 1 → każdy sąsiad zna każdego innego sąsiada = <em>pełna klika</em></li>
+        <li>CC = 0 → żaden z sąsiadów nie jest ze sobą połączony = <strong>gwiazda</strong></li>
+        <li>Wysoki CC = środowisko <em>hermetyczne</em>. Niski CC przy wysokim degree = broker łączący odrębne klastry</li>
+      </ul>
+    </section>
+
+    <!-- SLAJD 18 — Interpretacja: Space Monkeys / echochamber -->
+    <section class="slide-interpretation">
+      <div class="tag">Interpretacja · Blok 6 — Clustering</div>
+      <h2>Space Monkeys: anatomia sekty</h2>
+      <h3>Echochamber — informacja krąży, nie wycieka</h3>
+
+      <ul>
+        <li>Węzły Project Mayhem mają <em>najwyższy CC w całym grafie</em> — każdy zna każdego, żaden nie wychodzi poza grupę</li>
+        <li>Wysoki CC + niska closeness na zewnątrz = struktura <strong>echochambera</strong> — informacje krążą wewnętrznie, nie wpływają ani nie wypływają</li>
+        <li>Tyler <em>projektuje tę architekturę celowo</em>: reguły rekrutacji, anonimowość, zakaz indywidualnej inicjatywy — to algorytm maximalizacji CC</li>
+        <li>Narracyjna konsekwencja: <strong>rój wykonuje rozkazy bez pytań</strong> — jest strukturalnie zamknięty na wątpliwości</li>
+        <li>Śmierć ego w Project Mayhem = <em>śmierć węzła</em> jako unikalnej jednostki — stają się jednym klastrem</li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOK 7 — Mosty i anomalie
+    ═══════════════════════════════════════════════════════════ -->
+
+    <!-- SLAJD 19 — Pojęcie: Mosty -->
+    <section class="slide-concept">
+      <div class="tag gold">Pojęcie · Blok 7 — Mosty</div>
+      <h2>Structural Bridges</h2>
+      <h3>Krawędzie krytyczne — algorytm Tarjana</h3>
+
+      <div class="def-box gold">
+        <strong>Most (Bridge):</strong><br/>
+        Krawędź (u, v) jest mostem, jeśli jej usunięcie zwiększa liczbę spójnych składowych grafu.<br/><br/>
+        Wykrywanie: DFS z licznikami discovery[v] i low[v].<br/>
+        Warunek: low[v] &gt; discovery[u] → (u,v) jest mostem.
+      </div>
+
+      <ul>
+        <li>Mosty to <em>krawędzie krytyczne</em> — jedyne połączenia między składowymi sieci</li>
+        <li><strong>Cut vertex</strong> (punkt artykulacji): węzeł, którego usunięcie rozspójnia graf</li>
+        <li>Złożoność algorytmu Tarjana: O(V + E) — liniowa, skalowalna do dużych sieci</li>
+      </ul>
+    </section>
+
+    <!-- SLAJD 20 — Interpretacja: Bob + anomalia -->
+    <section class="slide-interpretation">
+      <div class="tag">Interpretacja · Blok 7 — Mosty i anomalie</div>
+      <h2>Bob i węzeł-pęknięcie</h2>
+      <h3>Śmierć mostu i błąd parsowania jako środek stylistyczny</h3>
+
+      <ul>
+        <li>Bob jest <em>jedynym węzłem</em> łączącym klaster Grup Wsparcia z Fight Clubem — jego krawędź to <strong>most strukturalny</strong></li>
+        <li>Śmierć Boba w fabule = <em>usunięcie mostu</em>: sfera słabości odłącza się od sfery agresji, Jack traci ostatni ludzki łącznik</li>
+        <li><strong>Anomalia:</strong> węzeł <span style="font-family:var(--mono); color:var(--red)">JACK / NO... TYLER</span> — błąd parsowania didaskaliów w momencie kulminacji psychotycznej</li>
+        <li>Scenariusz się łamie <em>dokładnie tam, gdzie Jack się łamie</em> — forma didaskaliów staje się treścią psychozy (Moretti: literatura to dane)</li>
+        <li>Węzeł-anomalia: jedyne miejsce w grafie, gdzie Jack i Tyler <strong>współistnieją jako jeden zapis</strong> — parser nie może ich rozdzielić, bo sam Jack nie może</li>
+      </ul>
+
+      <div class="node-highlight">"JACK / NO... TYLER"</div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOK 8 — Zamknięcie
+    ═══════════════════════════════════════════════════════════ -->
+
+    <!-- SLAJD 21 — Propozycje dalszych analiz -->
+    <section>
+      <div class="tag gold">Blok 8 — Co dalej?</div>
+      <h2>Pięć kierunków badań</h2>
+      <h3>Rozszerzenia metodologiczne — od statyki do dynamiki</h3>
+
+      <div class="research-grid">
+        <div class="research-item">
+          <span class="r-num">01 · Analiza temporalna</span>
+          Graf dynamiczny: jak sieć ewoluuje akt po akcie? Kiedy Tyler staje się dominującym węzłem?
+        </div>
+        <div class="research-item">
+          <span class="r-num">02 · Graf bipartite</span>
+          Postacie × Sceny: które sceny są najbardziej centralne? Które postacie współdzielą sceny bez Jacka?
+        </div>
+        <div class="research-item">
+          <span class="r-num">03 · Analiza sentymentu</span>
+          Waga krawędzi = współwystępowanie, ale jaki jest <em>ton</em> sceny? Agresja vs. czułość jako atrybut krawędzi.
+        </div>
+        <div class="research-item">
+          <span class="r-num">04 · Robustness</span>
+          Symulacja ataków ukierunkowanych: usuwaj węzły wg degree/betweenness — jak szybko sieć się rozpada?
+        </div>
+        <div class="research-item" style="grid-column: 1 / -1">
+          <span class="r-num">05 · Fincher vs. Fincher</span>
+          Porównanie sieci Fight Club (1999) z The Social Network (2010) — czy reżyser ma "podpis grafowy"?
+        </div>
+      </div>
+    </section>
+
+    <!-- SLAJD 22 — Interaktywny Dashboard -->
+    <section class="iframe-slide" style="padding:0 !important">
+      <div class="iframe-header">
+        <span class="dot"></span>
+        Eksploracja sieci: Fight Club — dashboard interaktywny
+      </div>
+      <iframe
+        src="fight_club.html"
+        title="Interaktywny dashboard SNA — Fight Club"
+        allowfullscreen
+      ></iframe>
+    </section>
+
+  </div><!-- /slides -->
+</div><!-- /reveal -->
+
+<!-- Reveal.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    progress: true,
+    controls: true,
+    controlsTutorial: false,
+    center: false,
+    transition: 'fade',
+    transitionSpeed: 'slow',
+    backgroundTransition: 'fade',
+    width: 1280,
+    height: 720,
+    margin: 0.06,
+    minScale: 0.2,
+    maxScale: 2.0,
+    plugins: [],
+  });
+
+  // Fix iframe slide: disable Reveal scroll on that slide
+  Reveal.on('slidechanged', ({ currentSlide }) => {
+    if (currentSlide.classList.contains('iframe-slide')) {
+      document.querySelector('.reveal').style.overflow = 'hidden';
+    }
+  });
+</script>
+</body>
+</html>

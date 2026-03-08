@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Pulp Fiction — Analiza Sieci Postaci</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+
+  :root {
+    --blood: #c0392b;
+    --gold: #f39c12;
+    --cream: #f5e6c8;
+    --dark: #0d0d0d;
+    --mid: #1a1a1a;
+    --smoke: #2a2a2a;
+    --c0: #e74c3c;
+    --c1: #3498db;
+    --c2: #2ecc71;
+    --text: #d4c4a0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Courier Prime', monospace;
+    min-height: 100vh;
+  }
+
+  /* TITLE */
+  header {
+    text-align: center;
+    padding: 32px 20px 16px;
+    border-bottom: 1px solid #333;
+    position: relative;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--blood), var(--gold), var(--blood));
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    letter-spacing: 0.15em;
+    color: var(--cream);
+    text-shadow: 2px 2px 0 var(--blood), 4px 4px 0 #000;
+    line-height: 1;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  /* LAYOUT */
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    height: calc(100vh - 130px);
+  }
+
+  /* GRAPH */
+  #graph-panel {
+    position: relative;
+    border-right: 1px solid #333;
+  }
+
+  #graph-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* CONTROLS */
+  .controls {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .ctrl-btn {
+    background: #1a1a1a;
+    border: 1px solid #444;
+    color: var(--text);
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    padding: 5px 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .ctrl-btn:hover, .ctrl-btn.active {
+    background: var(--blood);
+    border-color: var(--blood);
+    color: #fff;
+  }
+
+  /* SIDEBAR */
+  #sidebar {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--mid);
+  }
+
+  .panel {
+    padding: 16px;
+    border-bottom: 1px solid #333;
+  }
+
+  .panel-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  /* NODE CARD */
+  #node-card {
+    min-height: 200px;
+  }
+
+  #node-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.1em;
+    color: var(--cream);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  #node-community-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid #2a2a2a;
+    font-size: 0.72rem;
+  }
+  .metric-label { color: #888; letter-spacing: 0.05em; }
+  .metric-val { color: var(--gold); font-weight: bold; }
+
+  .metric-bar-wrap {
+    height: 3px;
+    background: #333;
+    flex: 1;
+    margin: 0 8px;
+  }
+  .metric-bar {
+    height: 100%;
+    background: var(--blood);
+    transition: width 0.4s ease;
+  }
+
+  /* LEGEND */
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    margin-bottom: 6px;
+    cursor: pointer;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+  }
+  .legend-item:hover { opacity: 1; }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* RANKING TABLE */
+  #ranking-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  #ranking-panel::-webkit-scrollbar { width: 4px; }
+  #ranking-panel::-webkit-scrollbar-track { background: #111; }
+  #ranking-panel::-webkit-scrollbar-thumb { background: #444; }
+
+  .rank-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .rank-tab {
+    background: #111;
+    border: 1px solid #333;
+    color: #888;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .rank-tab.active {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .rank-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid #222;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 0.72rem;
+  }
+  .rank-row:hover { background: #1f1f1f; }
+  .rank-num {
+    color: #555;
+    width: 18px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .rank-name { flex: 1; color: var(--cream); }
+  .rank-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .rank-score {
+    color: var(--gold);
+    width: 50px;
+    text-align: right;
+    font-size: 0.68rem;
+  }
+  .rank-bar-wrap {
+    width: 50px;
+    height: 2px;
+    background: #333;
+  }
+  .rank-bar { height: 100%; background: var(--blood); }
+
+  /* TOOLTIP */
+  #tooltip {
+    position: fixed;
+    background: rgba(10,10,10,0.95);
+    border: 1px solid var(--blood);
+    color: var(--cream);
+    padding: 8px 12px;
+    font-size: 0.7rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 999;
+    font-family: 'Courier Prime', monospace;
+    max-width: 200px;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip strong {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    display: block;
+    color: var(--gold);
+    margin-bottom: 2px;
+  }
+
+  .placeholder-text {
+    color: #555;
+    font-size: 0.72rem;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* Edge highlight */
+  line.dimmed { opacity: 0.04; }
+  circle.dimmed { opacity: 0.08; }
+  text.dimmed { opacity: 0.05; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Pulp Fiction</h1>
+  <div class="subtitle">Analiza Sieci Postaci &nbsp;·&nbsp; Social Network Analysis &nbsp;·&nbsp; Humanistyka Cyfrowa</div>
+</header>
+
+<div class="container">
+  <!-- GRAPH -->
+  <div id="graph-panel">
+    <div class="controls">
+      <button class="ctrl-btn active" data-mode="degree">Stopień</button>
+      <button class="ctrl-btn" data-mode="betweenness">Pośrednictwo</button>
+      <button class="ctrl-btn" data-mode="closeness">Bliskość</button>
+      <button class="ctrl-btn" data-mode="pagerank">PageRank</button>
+      <button class="ctrl-btn" data-mode="reset">↺ Reset</button>
+      <div style="width:1px;height:18px;background:#333;margin:0 2px;align-self:center;flex-shrink:0;"></div>
+      <button class="ctrl-btn" id="layout-btn">&#9671; Grupy</button>
+    </div>
+    <svg id="graph-svg"></svg>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="panel" id="node-card">
+      <div class="panel-title">Postać</div>
+      <div class="placeholder-text">Kliknij węzeł na grafie,<br>aby zobaczyć szczegóły...</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Społeczności</div>
+      <div class="legend-item" data-comm="0">
+        <div class="legend-dot" style="background:var(--c0)"></div>
+        <span>Świat Jules'a / Vincenta</span>
+      </div>
+      <div class="legend-item" data-comm="1">
+        <div class="legend-dot" style="background:var(--c1)"></div>
+        <span>Świat Butcha</span>
+      </div>
+      <div class="legend-item" data-comm="2">
+        <div class="legend-dot" style="background:var(--c2)"></div>
+        <span>Diner / Honey Bunny</span>
+      </div>
+    </div>
+
+    <div id="ranking-panel">
+      <div class="panel-title">Ranking Centralności</div>
+      <div class="rank-tabs">
+        <button class="rank-tab active" data-rank="degree">Stopień</button>
+        <button class="rank-tab" data-rank="betweenness">Pośred.</button>
+        <button class="rank-tab" data-rank="closeness">Bliskość</button>
+        <button class="rank-tab" data-rank="pagerank">PageRank</button>
+      </div>
+      <div id="rank-list"></div>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+const GRAPH = {"nodes":[{"id":"JULES","degree":44,"betweenness":0.2064,"closeness":0.6333,"pagerank":0.1028,"clustering":0.0353,"community":0},{"id":"VINCENT","degree":66,"betweenness":0.4834,"closeness":0.7451,"pagerank":0.1599,"clustering":0.0201,"community":0},{"id":"MIA","degree":16,"betweenness":0.06,"closeness":0.5,"pagerank":0.043,"clustering":0.0415,"community":0},{"id":"JIMMIE","degree":12,"betweenness":0.0,"closeness":0.4471,"pagerank":0.0275,"clustering":0.2554,"community":0},{"id":"THE WOLF","degree":13,"betweenness":0.0,"closeness":0.4471,"pagerank":0.0297,"clustering":0.27,"community":0},{"id":"LANCE","degree":9,"betweenness":0.0012,"closeness":0.4471,"pagerank":0.0245,"clustering":0.1068,"community":0},{"id":"BUTCH","degree":21,"betweenness":0.2137,"closeness":0.5758,"pagerank":0.0686,"clustering":0.0192,"community":1},{"id":"FADE TO BLACK","degree":11,"betweenness":0.1371,"closeness":0.5278,"pagerank":0.0377,"clustering":0.033,"community":1},{"id":"HONEY BUNNY","degree":16,"betweenness":0.0734,"closeness":0.5135,"pagerank":0.0413,"clustering":0.0494,"community":2},{"id":"PUMPKIN","degree":16,"betweenness":0.0734,"closeness":0.5135,"pagerank":0.0413,"clustering":0.0494,"community":2},{"id":"JODY","degree":8,"betweenness":0.0051,"closeness":0.4524,"pagerank":0.0235,"clustering":0.0677,"community":0},{"id":"ESMARELDA","degree":3,"betweenness":0.0,"closeness":0.3689,"pagerank":0.0122,"clustering":0,"community":1},{"id":"MARVIN","degree":7,"betweenness":0.0,"closeness":0.5,"pagerank":0.0201,"clustering":0.0881,"community":1},{"id":"ENGLISH DAVE","degree":4,"betweenness":0.0218,"closeness":0.4872,"pagerank":0.013,"clustering":0.0825,"community":0},{"id":"FABIENNE","degree":4,"betweenness":0.0,"closeness":0.38,"pagerank":0.0152,"clustering":0.1482,"community":1},{"id":"MARSELLUS","degree":4,"betweenness":0.0102,"closeness":0.4419,"pagerank":0.0156,"clustering":0.0494,"community":1},{"id":"MANAGER","degree":12,"betweenness":0.0009,"closeness":0.4935,"pagerank":0.0301,"clustering":0.0788,"community":2},{"id":"WAITRESS","degree":4,"betweenness":0.0002,"closeness":0.3519,"pagerank":0.0143,"clustering":0.0632,"community":2},{"id":"YOUNG MAN","degree":4,"betweenness":0.0002,"closeness":0.3519,"pagerank":0.0143,"clustering":0.0632,"community":2},{"id":"YOUNG WOMAN","degree":4,"betweenness":0.0002,"closeness":0.3519,"pagerank":0.0143,"clustering":0.0632,"community":2},{"id":"BRETT","degree":5,"betweenness":0.0232,"closeness":0.5,"pagerank":0.0158,"clustering":0.0727,"community":1},{"id":"ROGER","degree":5,"betweenness":0.0232,"closeness":0.5,"pagerank":0.0158,"clustering":0.0727,"community":1},{"id":"TRUDI","degree":2,"betweenness":0.0147,"closeness":0.4368,"pagerank":0.0084,"clustering":0.0848,"community":0},{"id":"BUDDY","degree":2,"betweenness":0.0063,"closeness":0.4368,"pagerank":0.0082,"clustering":0.1224,"community":0},{"id":"ED SULLIVAN","degree":2,"betweenness":0.0063,"closeness":0.4368,"pagerank":0.0082,"clustering":0.1224,"community":0},{"id":"LANCE AND VINCENT","degree":3,"betweenness":0.0449,"closeness":0.4419,"pagerank":0.0107,"clustering":0.0865,"community":0},{"id":"MOTHER","degree":3,"betweenness":0.0063,"closeness":0.4691,"pagerank":0.0111,"clustering":0.08,"community":1},{"id":"KLONDIKE","degree":2,"betweenness":0.0035,"closeness":0.38,"pagerank":0.0095,"clustering":0.0934,"community":1},{"id":"PEDESTRIAN","degree":2,"betweenness":0.0049,"closeness":0.3725,"pagerank":0.0099,"clustering":0.0741,"community":1},{"id":"MAYNARD","degree":4,"betweenness":0.106,"closeness":0.3958,"pagerank":0.0222,"clustering":0.0254,"community":1},{"id":"THE GIMP","degree":2,"betweenness":0.0,"closeness":0.2879,"pagerank":0.0149,"clustering":0.0588,"community":1},{"id":"ZED","degree":2,"betweenness":0.0,"closeness":0.2879,"pagerank":0.0149,"clustering":0.0588,"community":1},{"id":"FOURTH MAN","degree":2,"betweenness":0.003,"closeness":0.4419,"pagerank":0.0079,"clustering":0.1513,"community":0},{"id":"RAQUEL","degree":3,"betweenness":0.003,"closeness":0.4471,"pagerank":0.011,"clustering":0.0896,"community":0},{"id":"WINSTON","degree":3,"betweenness":0.003,"closeness":0.4471,"pagerank":0.011,"clustering":0.0896,"community":0},{"id":"PATRON","degree":5,"betweenness":0.0541,"closeness":0.475,"pagerank":0.0144,"clustering":0.0829,"community":2},{"id":"FADE OUT","degree":7,"betweenness":0.0541,"closeness":0.4872,"pagerank":0.019,"clustering":0.0703,"community":2},{"id":"THE END","degree":7,"betweenness":0.0541,"closeness":0.4872,"pagerank":0.019,"clustering":0.0703,"community":2},{"id":"YOLANDA","degree":7,"betweenness":0.0541,"closeness":0.4872,"pagerank":0.019,"clustering":0.0703,"community":2}],"edges":[{"source":"JULES","target":"VINCENT","weight":17},{"source":"JULES","target":"JIMMIE","weight":4},{"source":"JULES","target":"THE WOLF","weight":4},{"source":"JULES","target":"MARVIN","weight":2},{"source":"JULES","target":"HONEY BUNNY","weight":2},{"source":"JULES","target":"MANAGER","weight":2},{"source":"JULES","target":"PUMPKIN","weight":2},{"source":"JULES","target":"BRETT","weight":1},{"source":"JULES","target":"BUTCH","weight":1},{"source":"JULES","target":"ROGER","weight":1},{"source":"JULES","target":"FOURTH MAN","weight":1},{"source":"JULES","target":"MARSELLUS","weight":1},{"source":"JULES","target":"RAQUEL","weight":1},{"source":"JULES","target":"WINSTON","weight":1},{"source":"JULES","target":"PATRON","weight":1},{"source":"JULES","target":"FADE OUT","weight":1},{"source":"JULES","target":"THE END","weight":1},{"source":"JULES","target":"YOLANDA","weight":1},{"source":"VINCENT","target":"MIA","weight":9},{"source":"VINCENT","target":"LANCE","weight":5},{"source":"VINCENT","target":"JODY","weight":3},{"source":"VINCENT","target":"THE WOLF","weight":3},{"source":"VINCENT","target":"BUTCH","weight":2},{"source":"VINCENT","target":"MARVIN","weight":2},{"source":"VINCENT","target":"ENGLISH DAVE","weight":2},{"source":"VINCENT","target":"JIMMIE","weight":2},{"source":"VINCENT","target":"HONEY BUNNY","weight":2},{"source":"VINCENT","target":"MANAGER","weight":2},{"source":"VINCENT","target":"PUMPKIN","weight":2},{"source":"VINCENT","target":"BRETT","weight":1},{"source":"VINCENT","target":"ROGER","weight":1},{"source":"VINCENT","target":"TRUDI","weight":1},{"source":"VINCENT","target":"BUDDY","weight":1},{"source":"VINCENT","target":"ED SULLIVAN","weight":1},{"source":"VINCENT","target":"LANCE AND VINCENT","weight":1},{"source":"VINCENT","target":"FADE TO BLACK","weight":1},{"source":"VINCENT","target":"MOTHER","weight":1},{"source":"VINCENT","target":"FOURTH MAN","weight":1},{"source":"VINCENT","target":"RAQUEL","weight":1},{"source":"VINCENT","target":"WINSTON","weight":1},{"source":"VINCENT","target":"PATRON","weight":1},{"source":"VINCENT","target":"FADE OUT","weight":1},{"source":"VINCENT","target":"THE END","weight":1},{"source":"VINCENT","target":"YOLANDA","weight":1},{"source":"MIA","target":"BUDDY","weight":1},{"source":"MIA","target":"ED SULLIVAN","weight":1},{"source":"MIA","target":"JODY","weight":1},{"source":"MIA","target":"LANCE","weight":1},{"source":"MIA","target":"FADE TO BLACK","weight":1},{"source":"MIA","target":"MOTHER","weight":1},{"source":"MIA","target":"ENGLISH DAVE","weight":1},{"source":"JIMMIE","target":"THE WOLF","weight":6},{"source":"LANCE","target":"JODY","weight":2},{"source":"LANCE","target":"LANCE AND VINCENT","weight":1},{"source":"BUTCH","target":"FADE TO BLACK","weight":4},{"source":"BUTCH","target":"ESMARELDA","weight":3},{"source":"BUTCH","target":"FABIENNE","weight":2},{"source":"BUTCH","target":"MARSELLUS","weight":2},{"source":"BUTCH","target":"BRETT","weight":1},{"source":"BUTCH","target":"MARVIN","weight":1},{"source":"BUTCH","target":"ROGER","weight":1},{"source":"BUTCH","target":"ENGLISH DAVE","weight":1},{"source":"BUTCH","target":"KLONDIKE","weight":1},{"source":"BUTCH","target":"PEDESTRIAN","weight":1},{"source":"BUTCH","target":"MAYNARD","weight":1},{"source":"FADE TO BLACK","target":"FABIENNE","weight":2},{"source":"FADE TO BLACK","target":"MOTHER","weight":1},{"source":"FADE TO BLACK","target":"KLONDIKE","weight":1},{"source":"FADE TO BLACK","target":"MAYNARD","weight":1},{"source":"HONEY BUNNY","target":"PUMPKIN","weight":3},{"source":"HONEY BUNNY","target":"MANAGER","weight":2},{"source":"HONEY BUNNY","target":"WAITRESS","weight":1},{"source":"HONEY BUNNY","target":"YOUNG MAN","weight":1},{"source":"HONEY BUNNY","target":"YOUNG WOMAN","weight":1},{"source":"HONEY BUNNY","target":"PATRON","weight":1},{"source":"HONEY BUNNY","target":"FADE OUT","weight":1},{"source":"HONEY BUNNY","target":"THE END","weight":1},{"source":"HONEY BUNNY","target":"YOLANDA","weight":1},{"source":"PUMPKIN","target":"MANAGER","weight":2},{"source":"PUMPKIN","target":"WAITRESS","weight":1},{"source":"PUMPKIN","target":"YOUNG MAN","weight":1},{"source":"PUMPKIN","target":"YOUNG WOMAN","weight":1},{"source":"PUMPKIN","target":"PATRON","weight":1},{"source":"PUMPKIN","target":"FADE OUT","weight":1},{"source":"PUMPKIN","target":"THE END","weight":1},{"source":"PUMPKIN","target":"YOLANDA","weight":1},{"source":"JODY","target":"TRUDI","weight":1},{"source":"JODY","target":"LANCE AND VINCENT","weight":1},{"source":"MARVIN","target":"BRETT","weight":1},{"source":"MARVIN","target":"ROGER","weight":1},{"source":"MARSELLUS","target":"PEDESTRIAN","weight":1},{"source":"MANAGER","target":"PATRON","weight":1},{"source":"MANAGER","target":"FADE OUT","weight":1},{"source":"MANAGER","target":"THE END","weight":1},{"source":"MANAGER","target":"YOLANDA","weight":1},{"source":"WAITRESS","target":"YOUNG MAN","weight":1},{"source":"WAITRESS","target":"YOUNG WOMAN","weight":1},{"source":"YOUNG MAN","target":"YOUNG WOMAN","weight":1},{"source":"BRETT","target":"ROGER","weight":1},{"source":"MAYNARD","target":"THE GIMP","weight":1},{"source":"MAYNARD","target":"ZED","weight":1},{"source":"THE GIMP","target":"ZED","weight":1},{"source":"RAQUEL","target":"WINSTON","weight":1},{"source":"FADE OUT","target":"THE END","weight":1},{"source":"FADE OUT","target":"YOLANDA","weight":1},{"source":"THE END","target":"YOLANDA","weight":1}]};
+
+const COMM_COLORS = ['#e74c3c','#3498db','#2ecc71'];
+const COMM_NAMES = ["Świat Jules'a / Vincenta","Świat Butcha","Diner / Honey Bunny"];
+const METRICS = {
+  degree: { label: 'Stopień (ważony)', fmt: v => v.toFixed(0) },
+  betweenness: { label: 'Pośrednictwo', fmt: v => v.toFixed(4) },
+  closeness: { label: 'Bliskość', fmt: v => v.toFixed(4) },
+  pagerank: { label: 'PageRank', fmt: v => v.toFixed(4) }
+};
+
+let currentMode = 'degree';
+let currentRankMetric = 'degree';
+let selectedNode = null;
+let clusterMode = false;
+const CLUSTER_TARGETS = {
+  0: { x: -200, y: -150 },  // Jules/Vincent — lewo-góra
+  1: { x:  200, y: -150 },  // Butch — prawo-góra
+  2: { x:    0, y:  220 },  // Diner/Honey Bunny — dół
+};
+
+function clusterForce(alpha) {
+  GRAPH.nodes.forEach(n => {
+    const t = CLUSTER_TARGETS[n.community];
+    if (!t) return;
+    n.vx += (t.x - n.x) * 0.45 * alpha;
+    n.vy += (t.y - n.y) * 0.45 * alpha;
+  });
+}
+
+function toggleClusterLayout() {
+  clusterMode = !clusterMode;
+  const btn = document.getElementById('layout-btn');
+  if (clusterMode) {
+    sim.force('cluster', clusterForce);
+    sim.force('charge').strength(-35);
+    sim.force('link').distance(() => 25).strength(0.15);
+    btn.classList.add('active');
+  } else {
+    sim.force('cluster', null);
+    sim.force('charge').strength(-180);
+    sim.force('link')
+      .distance(d => 80 - d.weight * 2)
+      .strength(d => 0.2 + d.weight * 0.05);
+    btn.classList.remove('active');
+  }
+  sim.alphaTarget(0.3).restart();
+  setTimeout(() => sim.alphaTarget(0), 2800);
+}
+
+// ---- D3 FORCE GRAPH ----
+const svg = d3.select('#graph-svg');
+const W = () => document.getElementById('graph-panel').clientWidth;
+const H = () => document.getElementById('graph-panel').clientHeight;
+
+const g = svg.append('g');
+svg.call(d3.zoom().scaleExtent([0.3,3]).on('zoom', e => g.attr('transform', e.transform)));
+
+const maxDeg = Math.max(...GRAPH.nodes.map(n => n.degree));
+const maxBet = Math.max(...GRAPH.nodes.map(n => n.betweenness));
+const maxClo = Math.max(...GRAPH.nodes.map(n => n.closeness));
+const maxPR  = Math.max(...GRAPH.nodes.map(n => n.pagerank));
+const maxWeight = Math.max(...GRAPH.edges.map(e => e.weight));
+
+function getRadius(node, mode) {
+  const base = 5, scale = 28;
+  switch(mode) {
+    case 'degree': return base + (node.degree / maxDeg) * scale;
+    case 'betweenness': return base + (node.betweenness / maxBet) * scale;
+    case 'closeness': return base + (node.closeness / maxClo) * scale;
+    case 'pagerank': return base + (node.pagerank / maxPR) * scale;
+  }
+  return base + (node.degree / maxDeg) * scale;
+}
+
+const nodeMap = {};
+GRAPH.nodes.forEach(n => { nodeMap[n.id] = n; });
+
+const sim = d3.forceSimulation(GRAPH.nodes)
+  .force('link', d3.forceLink(GRAPH.edges).id(d => d.id).distance(d => 80 - d.weight * 2).strength(d => 0.2 + d.weight * 0.05))
+  .force('charge', d3.forceManyBody().strength(-180))
+  .force('center', d3.forceCenter(0, 0))
+  .force('collision', d3.forceCollide().radius(d => getRadius(d, currentMode) + 4));
+
+// Edges
+const link = g.append('g').selectAll('line')
+  .data(GRAPH.edges).enter().append('line')
+  .attr('stroke', '#555')
+  .attr('stroke-opacity', d => 0.15 + (d.weight / maxWeight) * 0.5)
+  .attr('stroke-width', d => 0.5 + (d.weight / maxWeight) * 3);
+
+// Node groups
+const node = g.append('g').selectAll('g')
+  .data(GRAPH.nodes).enter().append('g')
+  .style('cursor', 'pointer')
+  .call(d3.drag()
+    .on('start', (e,d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+    .on('drag',  (e,d) => { d.fx=e.x; d.fy=e.y; })
+    .on('end',   (e,d) => { if (!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }));
+
+const circles = node.append('circle')
+  .attr('r', d => getRadius(d, currentMode))
+  .attr('fill', d => COMM_COLORS[d.community])
+  .attr('fill-opacity', 0.85)
+  .attr('stroke', d => COMM_COLORS[d.community])
+  .attr('stroke-width', 1.5)
+  .attr('stroke-opacity', 0.5);
+
+const labels = node.append('text')
+  .text(d => d.id)
+  .attr('font-family', 'Courier Prime, monospace')
+  .attr('font-size', d => d.degree > 20 ? '9px' : '7px')
+  .attr('fill', '#ccc')
+  .attr('text-anchor', 'middle')
+  .attr('dy', d => getRadius(d, currentMode) + 10)
+  .attr('pointer-events', 'none');
+
+sim.on('tick', () => {
+  link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+  node.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+
+// ---- INTERACTIONS ----
+const tooltip = document.getElementById('tooltip');
+
+node.on('mouseover', (e, d) => {
+  tooltip.innerHTML = `<strong>${d.id}</strong>Stopień: ${d.degree}<br>PageRank: ${d.pagerank.toFixed(4)}<br>Pośrednictwo: ${d.betweenness.toFixed(4)}`;
+  tooltip.classList.add('visible');
+})
+.on('mousemove', e => {
+  tooltip.style.left = (e.clientX + 12) + 'px';
+  tooltip.style.top  = (e.clientY - 10) + 'px';
+})
+.on('mouseout', () => tooltip.classList.remove('visible'))
+.on('click', (e, d) => {
+  e.stopPropagation();
+  selectedNode = d.id;
+  highlightNode(d);
+  showNodeCard(d);
+});
+
+svg.on('click', () => {
+  selectedNode = null;
+  clearHighlight();
+  showNodeCard(null);
+});
+
+function highlightNode(d) {
+  const neighbors = new Set([d.id]);
+  GRAPH.edges.forEach(e => {
+    if (e.source.id === d.id || e.source === d.id) neighbors.add(e.target.id || e.target);
+    if (e.target.id === d.id || e.target === d.id) neighbors.add(e.source.id || e.source);
+  });
+
+  link.classed('dimmed', l => {
+    const sid = l.source.id || l.source;
+    const tid = l.target.id || l.target;
+    return sid !== d.id && tid !== d.id;
+  });
+  circles.classed('dimmed', n => !neighbors.has(n.id));
+  labels.classed('dimmed', n => !neighbors.has(n.id));
+  circles.attr('stroke-width', n => n.id === d.id ? 3 : 1.5)
+         .attr('stroke', n => n.id === d.id ? '#fff' : COMM_COLORS[n.community]);
+}
+
+function clearHighlight() {
+  link.classed('dimmed', false);
+  circles.classed('dimmed', false);
+  labels.classed('dimmed', false);
+  circles.attr('stroke-width', 1.5).attr('stroke', n => COMM_COLORS[n.community]);
+}
+
+function showNodeCard(d) {
+  const card = document.getElementById('node-card');
+  if (!d) {
+    card.innerHTML = `<div class="panel-title">Postać</div><div class="placeholder-text">Kliknij węzeł na grafie,<br>aby zobaczyć szczegóły...</div>`;
+    return;
+  }
+
+  const metricMaxes = { degree: maxDeg, betweenness: maxBet, closeness: maxClo, pagerank: maxPR, clustering: 1 };
+  const metricDefs = [
+    { key: 'degree', label: 'Stopień (ważony)' },
+    { key: 'betweenness', label: 'Pośrednictwo' },
+    { key: 'closeness', label: 'Bliskość' },
+    { key: 'pagerank', label: 'PageRank' },
+    { key: 'clustering', label: 'Klasteryzacja' },
+  ];
+
+  let rows = metricDefs.map(m => {
+    const pct = (d[m.key] / metricMaxes[m.key]) * 100;
+    return `<div class="metric-row">
+      <span class="metric-label">${m.label}</span>
+      <div class="metric-bar-wrap"><div class="metric-bar" style="width:${pct}%"></div></div>
+      <span class="metric-val">${m.key === 'degree' ? d[m.key] : d[m.key].toFixed(4)}</span>
+    </div>`;
+  }).join('');
+
+  // Neighbors
+  const neighbors = [];
+  GRAPH.edges.forEach(e => {
+    const s = e.source.id || e.source, t = e.target.id || e.target;
+    if (s === d.id) neighbors.push({ id: t, weight: e.weight });
+    if (t === d.id) neighbors.push({ id: s, weight: e.weight });
+  });
+  neighbors.sort((a,b) => b.weight - a.weight);
+  const nbStr = neighbors.slice(0, 5).map(n => `<span style="color:${COMM_COLORS[nodeMap[n.id]?.community||0]}">${n.id}</span> (${n.weight})`).join(', ');
+
+  card.innerHTML = `
+    <div class="panel-title">Postać</div>
+    <div id="node-name">${d.id}</div>
+    <div id="node-community-tag" style="background:${COMM_COLORS[d.community]}33;color:${COMM_COLORS[d.community]};border:1px solid ${COMM_COLORS[d.community]}66">${COMM_NAMES[d.community]}</div>
+    ${rows}
+    <div style="margin-top:10px;font-size:0.68rem;color:#888;">
+      Główne powiązania:<br><span style="color:var(--text)">${nbStr}</span>
+    </div>
+  `;
+}
+
+// ---- MODE BUTTONS ----
+document.querySelectorAll('.ctrl-btn[data-mode]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    if (mode === 'reset') {
+      sim.alpha(0.5).restart();
+      clearHighlight();
+      selectedNode = null;
+      showNodeCard(null);
+      return;
+    }
+    currentMode = mode;
+    document.querySelectorAll('.ctrl-btn[data-mode]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    circles.transition().duration(500).attr('r', d => getRadius(d, mode));
+    labels.transition().duration(500).attr('dy', d => getRadius(d, mode) + 10);
+    sim.force('collision', d3.forceCollide().radius(d => getRadius(d, mode) + 4));
+    sim.alpha(0.3).restart();
+
+    updateRanking(currentRankMetric);
+  });
+});
+
+document.getElementById('layout-btn').addEventListener('click', toggleClusterLayout);
+
+// ---- RANKING ----
+function updateRanking(metric) {
+  const sorted = [...GRAPH.nodes].sort((a,b) => b[metric] - a[metric]).slice(0, 15);
+  const maxVal = sorted[0][metric];
+  const list = document.getElementById('rank-list');
+  list.innerHTML = sorted.map((n, i) => {
+    const pct = (n[metric] / maxVal) * 100;
+    const val = metric === 'degree' ? n[metric].toFixed(0) : n[metric].toFixed(4);
+    return `<div class="rank-row" data-id="${n.id}">
+      <span class="rank-num">${i+1}</span>
+      <div class="rank-dot" style="background:${COMM_COLORS[n.community]}"></div>
+      <span class="rank-name">${n.id}</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%"></div></div>
+      <span class="rank-score">${val}</span>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.rank-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const id = row.dataset.id;
+      const d = nodeMap[id];
+      if (d) {
+        selectedNode = id;
+        highlightNode(d);
+        showNodeCard(d);
+      }
+    });
+  });
+}
+
+document.querySelectorAll('.rank-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.rank-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentRankMetric = tab.dataset.rank;
+    updateRanking(currentRankMetric);
+  });
+});
+
+updateRanking('degree');
+
+// Initial zoom to fit
+setTimeout(() => {
+  const bounds = g.node().getBBox();
+  const w = W(), h = H();
+  const scale = Math.min(w / (bounds.width + 80), h / (bounds.height + 80)) * 0.85;
+  const tx = w/2 - scale * (bounds.x + bounds.width/2);
+  const ty = h/2 - scale * (bounds.y + bounds.height/2);
+  svg.call(d3.zoom().transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
+}, 2500);
+</script>
+</body>
+</html>

@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIGHT CLUB — Analiza Sieci Postaci</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  :root {
+    --bg-primary: #080706;
+    --bg-secondary: #100e0c;
+    --bg-panel: #120f0d;
+    --bg-card: #1a1512;
+    --red-blood: #b01c0a;
+    --red-bright: #e02010;
+    --yellow-bruise: #c8960a;
+    --yellow-light: #e8b020;
+    --cream: #d8cdc0;
+    --gray-mid: #6a6058;
+    --gray-light: #9a9088;
+    --border: #2a2420;
+    --border-accent: #3a2820;
+    --font-display: 'Oswald', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--cream);
+    font-family: var(--font-mono);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  #header {
+    position: relative;
+    z-index: 10;
+    padding: 18px 30px 14px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #0d0a08 0%, transparent 100%);
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+  }
+
+  #header h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--red-bright);
+    text-shadow: 0 0 30px rgba(224,32,16,0.4), 2px 2px 0px #000;
+    line-height: 1;
+  }
+
+  #header h1 span {
+    color: var(--cream);
+  }
+
+  #header .subtitle {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--gray-mid);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-left: 2px solid var(--red-blood);
+    padding-left: 14px;
+  }
+
+  .rule-one {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--red-blood);
+    letter-spacing: 0.15em;
+    opacity: 0.6;
+    text-transform: uppercase;
+  }
+
+  /* MAIN LAYOUT */
+  #main-layout {
+    position: relative;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    height: calc(100vh - 65px);
+  }
+
+  /* LEFT: GRAPH CONTAINER */
+  #graph-container {
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 40% 50%, #1a0e08 0%, #080706 60%);
+    border-right: 1px solid var(--border);
+  }
+
+  #mode-controls {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 20;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .mode-btn {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    background: rgba(10,8,6,0.85);
+    border: 1px solid var(--border-accent);
+    color: var(--gray-mid);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mode-btn:hover {
+    border-color: var(--yellow-bruise);
+    color: var(--yellow-light);
+  }
+
+  .mode-btn.active {
+    background: var(--red-blood);
+    border-color: var(--red-bright);
+    color: var(--cream);
+    box-shadow: 0 0 10px rgba(176,28,10,0.5);
+  }
+
+  #graph-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* RIGHT PANEL */
+  #right-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-panel);
+  }
+
+  /* NODE CARD */
+  #node-card {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    min-height: 200px;
+    flex-shrink: 0;
+  }
+
+  #node-card .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 160px;
+    color: var(--gray-mid);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+    gap: 8px;
+  }
+
+  #node-card .empty-state .icon {
+    font-size: 1.8rem;
+    opacity: 0.3;
+  }
+
+  #card-name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 6px;
+    line-height: 1.1;
+  }
+
+  #card-community-tag {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    margin-bottom: 10px;
+  }
+
+  .metric-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+  }
+
+  .metric-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .metric-bar-wrap {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    position: relative;
+  }
+
+  .metric-bar-fill {
+    height: 100%;
+    background: var(--red-blood);
+    transition: width 0.4s ease;
+  }
+
+  .metric-value {
+    font-size: 0.6rem;
+    color: var(--yellow-bruise);
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .connections-title {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    margin-top: 10px;
+    margin-bottom: 6px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+  }
+
+  .conn-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.6rem;
+    padding: 2px 0;
+    color: var(--cream);
+    opacity: 0.8;
+  }
+
+  .conn-weight {
+    color: var(--yellow-bruise);
+  }
+
+  /* LEGEND */
+  #legend {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  #legend h3 {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray-light);
+    margin-bottom: 8px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .legend-item:hover { opacity: 0.7; }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .legend-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    color: var(--cream);
+    text-transform: uppercase;
+  }
+
+  .legend-count {
+    margin-left: auto;
+    font-size: 0.55rem;
+    color: var(--gray-mid);
+  }
+
+  /* RANKING */
+  #ranking {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  #ranking-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .rank-tab {
+    flex: 1;
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 4px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--gray-mid);
+    border-right: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+
+  .rank-tab:last-child { border-right: none; }
+  .rank-tab:hover { color: var(--yellow-light); }
+  .rank-tab.active {
+    color: var(--red-bright);
+    border-bottom: 2px solid var(--red-blood);
+    background: rgba(176,28,10,0.08);
+  }
+
+  #ranking-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+  }
+
+  #ranking-list::-webkit-scrollbar { width: 3px; }
+  #ranking-list::-webkit-scrollbar-track { background: var(--bg-primary); }
+  #ranking-list::-webkit-scrollbar-thumb { background: var(--border-accent); }
+
+  .rank-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid rgba(42,36,32,0.3);
+  }
+
+  .rank-row:hover { background: rgba(176,28,10,0.08); }
+
+  .rank-num {
+    font-size: 0.55rem;
+    color: var(--gray-mid);
+    width: 16px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .rank-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .rank-name {
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    color: var(--cream);
+    flex: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .rank-bar-wrap {
+    width: 40px;
+    height: 2px;
+    background: var(--border);
+  }
+
+  .rank-bar-fill {
+    height: 100%;
+    background: var(--red-blood);
+  }
+
+  .rank-val {
+    font-size: 0.58rem;
+    color: var(--yellow-bruise);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* TOOLTIP */
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: rgba(10,8,6,0.95);
+    border: 1px solid var(--red-blood);
+    padding: 10px 14px;
+    font-size: 0.62rem;
+    color: var(--cream);
+    z-index: 9999;
+    max-width: 180px;
+    display: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+  }
+
+  #tooltip .tt-name {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--yellow-light);
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-accent);
+    padding-bottom: 4px;
+  }
+
+  #tooltip .tt-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 2px;
+  }
+
+  #tooltip .tt-key { color: var(--gray-mid); }
+  #tooltip .tt-val { color: var(--cream); }
+
+  /* INTERPRETATION SECTION */
+  #interpretation {
+    position: relative;
+    z-index: 5;
+    background: var(--bg-secondary);
+    border-top: 2px solid var(--red-blood);
+    padding: 50px 60px;
+  }
+
+  #interpretation h2 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--red-bright);
+    margin-bottom: 8px;
+    text-shadow: 0 0 20px rgba(224,32,16,0.3);
+  }
+
+  #interpretation .section-rule {
+    width: 80px;
+    height: 2px;
+    background: var(--red-blood);
+    margin-bottom: 40px;
+  }
+
+  #interpretation h3 {
+    font-family: var(--font-display);
+    font-size: 1.0rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--yellow-light);
+    margin-top: 36px;
+    margin-bottom: 14px;
+  }
+
+  #interpretation p {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: var(--cream);
+    opacity: 0.85;
+    margin-bottom: 14px;
+    max-width: 900px;
+  }
+
+  #interpretation strong {
+    color: var(--yellow-light);
+    font-weight: normal;
+  }
+
+  #interpretation .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+    max-width: 700px;
+  }
+
+  #interpretation .stat-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-accent);
+    padding: 16px;
+    border-left: 3px solid var(--red-blood);
+  }
+
+  #interpretation .stat-box .s-val {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--red-bright);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  #interpretation .stat-box .s-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+  }
+
+  .scratch-line {
+    display: inline-block;
+    width: 30px;
+    height: 2px;
+    background: var(--red-blood);
+    margin: 0 6px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1><span>FIGHT </span>CLUB</h1>
+  <div class="subtitle">Analiza Sieci Postaci<br>Social Network Analysis</div>
+  <div class="rule-one">Pierwsza zasada: nie mówisz o sieci</div>
+</div>
+
+<div id="main-layout">
+  <div id="graph-container">
+    <div id="mode-controls">
+      <button class="mode-btn active" data-mode="degree">Stopień</button>
+      <button class="mode-btn" data-mode="betweenness">Pośrednictwo</button>
+      <button class="mode-btn" data-mode="closeness">Bliskość</button>
+      <button class="mode-btn" data-mode="pagerank">PageRank</button>
+      <button class="mode-btn" data-mode="reset">↺ Reset</button>
+      <div style="width:1px;height:18px;background:var(--border-accent);margin:0 2px;align-self:center;flex-shrink:0;"></div>
+      <button class="mode-btn" id="layout-btn">&#9671; Grupy</button>
+    </div>
+    <svg id="graph-svg"></svg>
+  </div>
+
+  <div id="right-panel">
+    <div id="node-card">
+      <div class="empty-state" id="card-empty">
+        <div class="icon">✦</div>
+        <div>Kliknij postać<br>aby zobaczyć szczegóły</div>
+      </div>
+      <div id="card-content" style="display:none;">
+        <div id="card-name"></div>
+        <div id="card-community-tag"></div>
+        <div id="card-metrics"></div>
+        <div id="card-connections"></div>
+      </div>
+    </div>
+
+    <div id="legend">
+      <h3>Społeczności</h3>
+      <div id="legend-items"></div>
+    </div>
+
+    <div id="ranking">
+      <div id="ranking-tabs">
+        <div class="rank-tab active" data-rank="degree">Stopień</div>
+        <div class="rank-tab" data-rank="betweenness">Pośred.</div>
+        <div class="rank-tab" data-rank="closeness">Bliskość</div>
+        <div class="rank-tab" data-rank="pagerank">PageRank</div>
+      </div>
+      <div id="ranking-list"></div>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip">
+  <div class="tt-name" id="tt-name"></div>
+  <div class="tt-row"><span class="tt-key">Stopień</span><span class="tt-val" id="tt-deg"></span></div>
+  <div class="tt-row"><span class="tt-key">Pośrednictwo</span><span class="tt-val" id="tt-bet"></span></div>
+  <div class="tt-row"><span class="tt-key">PageRank</span><span class="tt-val" id="tt-pr"></span></div>
+</div>
+
+<div id="interpretation">
+  <h2>Interpretacja Humanistyczna</h2>
+  <div class="section-rule"></div>
+
+  <div class="stat-grid" id="stat-grid">
+    <div class="stat-box"><div class="s-val" id="s-nodes">—</div><div class="s-label">Postacie</div></div>
+    <div class="stat-box"><div class="s-val" id="s-edges">—</div><div class="s-label">Relacje</div></div>
+    <div class="stat-box"><div class="s-val" id="s-density">—</div><div class="s-label">Gęstość</div></div>
+    <div class="stat-box"><div class="s-val" id="s-comms">—</div><div class="s-label">Społeczności</div></div>
+  </div>
+
+  <h3>§ I — Architektura Narcystycznej Apokalipsy</h3>
+  <p>Sieć postaci <strong>Fight Club</strong> (1999, reż. David Fincher) liczy <span id="interp-nodes">—</span> węzłów i <span id="interp-edges">—</span> krawędzi przy gęstości <span id="interp-density">—</span>. Niska gęstość to nie defekt — to <strong>diagnoza narracyjna</strong>: świat Narratora to konstelacja satelitów krążących wokół jednego centrum grawitacyjnego, nie organiczna wspólnota. Większość relacji przebiega przez dwa punkty, które w finale okazują się jednym. Graf jest nierozerwalnie spójny, lecz ta spójność jest pozorna — sieć utrzymuje się dzięki pojedynczej, patologicznej tożsamości.</p>
+
+  <h3>§ II — Centralność: Jack i Tyler jako dwa ciała w jednej orbicie</h3>
+  <p><strong>JACK</strong> dominuje wszystkie miary centralności — jego stopień ważony wynosi kilkadziesiąt jednostek, a betweenness zbliża się do maksimum. Jest tym, przez którego przechodzi każda rozmowa, każda scena. To klasyczna <em>gwiazda ego-sieci</em>: sieć istnieje tylko dlatego, że on istnieje. Paradoksalnie jednak <strong>TYLER</strong> zajmuje drugie miejsce w każdej mierze — szczególnie wysoki betweenness Tylera ujawnia, że wiele relacji drugorzędnych jest możliwych tylko przez niego. Tyler to alter ego Jacka zreifikowane do postaci węzła — brakujące ja, które zarządza częścią tożsamości, do której Narrator nie ma dostępu.</p>
+  <p><strong>MARLA</strong> tworzy trzeci wierzchołek trójkąta: stosunkowo wysoka bliskość (closeness) przy niskim stopniu wskazuje, że dociera do całej sieci krótką ścieżką — symbolicznie: Marla jest jedyną prawdziwą osobą w tej historii, jedyną, do której Narrator nie może być obojętny.</p>
+
+  <h3>§ III — Struktura Społeczności: Kluby jako Bańki Tożsamości</h3>
+  <p>Algorytm detekcji społeczności wyodrębnia <span id="interp-comms">—</span> grup. Pierwsza to <strong>triada władzy</strong> (Jack–Tyler–Marla) — jądro narracji. Drugą tworzą <strong>Space Monkeys</strong> — Ricky, Mechanic, Angel Face, Another Space Monkey — tj. szeregowi członkowie Fight Club / Projektu Mayhem. To najgęstszy lokalny klaster: wysoki clustering coefficient świadczy o tym, że są zamkniętym środowiskiem, <em>rojem bez twarzy</em>. Trzecia społeczność obejmuje grupy wsparcia: Bob, Everyone, Leader, Chloe, Speaker — świat emocjonalnej protezi, który Narrator odwiedza, zanim znajdzie inną formę ucieczki. Czwarta to <strong>aparat państwa</strong> — detektywi, policja — z grupy peryferyjnej, która pojawia się gdy narracja zbliża się do konsekwencji.</p>
+
+  <h3>§ IV — Mosty Strukturalne i Anomalie</h3>
+  <p><strong>BOB</strong> (Robert Paulson) jest mostem między grupą wsparcia a Fight Clubem — jedyną postacią, która przeszła z przestrzeni emocjonalnej w przestrzeń przemocy. Jego śmierć w fabule odpowiada strukturalnemu usunięciu mostu: po niej dwie społeczności stają się hermetyczne. <strong>Mechanic</strong> i <strong>Ricky</strong> mają relatywnie wysoki clustering coefficient — tworzą mikrospołeczność wewnątrz Fight Clubu. <strong>EVERYONE</strong>, <strong>ALL SPACE MONKEYS</strong>, <strong>OTHERS TOGETHER</strong> — to węzły-kolektywy, które scenariusz traktuje jako ciała zbiorowe; ich obecność w grafie potwierdza, że narracja odmawia im indywidualności.</p>
+  <p>Szczególną anomalią jest węzeł <strong>"JACK / NO... TYLER"</strong> — artefakt scenariusza dokumentujący moment pęknięcia tożsamości, kiedy skrypt przestaje wiedzieć, kto mówi. W grafie ten węzeł łączy się z Jackiem, Tylerem, Marlą i Space Monkeys — jest dosłownie punktem kolizji dwóch ja.</p>
+
+  <h3>§ V — Propozycje Dalszych Analiz</h3>
+  <p><strong>1. Analiza temporalna scen:</strong> Podział krawędzi na dwie warstwy czasowe (przed/po ujawnieniu tożsamości Tylera) ujawniłby, jak sieć zmienia strukturę w momencie narratologicznego zwrotu.</p>
+  <p><strong>2. Sieć bipartite postać–lokacja:</strong> Włączenie lokacji (piwnica, dom przy Paper Street, biuro) jako węzłów drugiego typu pokazałoby, jak przestrzeń segmentuje tożsamości.</p>
+  <p><strong>3. Analiza sentymentu dialogów:</strong> Ważenie krawędzi nie tylko współwystępowaniem, ale walencją emocjonalną dialogu (agresja, ironia, czułość) zmieniłoby obraz centralności.</p>
+  <p><strong>4. Usuwanie węzłów (robustness):</strong> Symulacja sekwencyjnego usuwania węzłów — od Jacka do Tylera — modelowałaby narracyjny efekt terapii dysocjacyjnej jako rozpad sieci.</p>
+  <p><strong>5. Porównanie z innymi sieciami Finchera:</strong> Zestawienie grafu Fight Club z sieciami z <em>Siedem</em> i <em>Zodiaka</em> mogłoby ujawnić strukturalne signatury reżyserskiego stylu: czy Fincher konsekwentnie buduje sieci zdominowane przez pojedyncze centrum?</p>
+</div>
+
+<script>
+const GRAPHML_DATA = `<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d0" for="edge" attr.name="weight" attr.type="long"/>
+<graph edgedefault="undirected"><node id="JACK"/>
+<node id="TYLER"/>
+<node id="MARLA"/>
+<node id="BOSS"/>
+<node id="BOB"/>
+<node id="ANGEL FACE"/>
+<node id="RICKY"/>
+<node id="MECHANIC"/>
+<node id="INTERN"/>
+<node id="EVERYONE"/>
+<node id="LEADER"/>
+<node id="CHLOE"/>
+<node id="ANOTHER SPACE MONKEY"/>
+<node id="SPEAKER"/>
+<node id="BUSINESS WOMAN"/>
+<node id="BUSISNESS WOMAN"/>
+<node id="SECURITY TFM"/>
+<node id="DOORMAN"/>
+<node id="WALTER"/>
+<node id="GOATEED MAN"/>
+<node id="OPPONENT"/>
+<node id="COP"/>
+<node id="DETECTIVE STERN"/>
+<node id="LOU"/>
+<node id="FIRST MAN"/>
+<node id="SECOND MAN"/>
+<node id="SEMINARIAN"/>
+<node id="CLERK"/>
+<node id="RAYMOND"/>
+<node id="OTHERS TOGETHER"/>
+<node id="JACOBS"/>
+<node id="VALET"/>
+<node id="RICKY AND MECHANIC"/>
+<node id="ALL SPACE MONKEYS"/>
+<node id="BARTENDER"/>
+<node id="BANDAGED PROPRIETOR"/>
+<node id="KITCHEN WORKERS"/>
+<node id="WOUNDED BARTENDER"/>
+<node id="DESK CLERK"/>
+<node id="DIFFERENT VOICE"/>
+<node id="WAITER"/>
+<node id="BALD DETECTIVE"/>
+<node id="BALDY"/>
+<node id="REDHEAD"/>
+<node id="REDHEAD DETECTIVE"/>
+<node id="STERN"/>
+<node id="JACK_TYLER_SPLIT"/>
+<node id="SHORT SPACE MONKEY"/>
+<node id="TALL SPACE MONKEY"/>
+<edge source="JACK" target="TYLER"><data key="d0">40</data></edge>
+<edge source="JACK" target="MARLA"><data key="d0">19</data></edge>
+<edge source="JACK" target="BOSS"><data key="d0">5</data></edge>
+<edge source="JACK" target="BOB"><data key="d0">4</data></edge>
+<edge source="JACK" target="ANGEL FACE"><data key="d0">3</data></edge>
+<edge source="JACK" target="RICKY"><data key="d0">3</data></edge>
+<edge source="JACK" target="MECHANIC"><data key="d0">3</data></edge>
+<edge source="JACK" target="INTERN"><data key="d0">2</data></edge>
+<edge source="JACK" target="ANOTHER SPACE MONKEY"><data key="d0">2</data></edge>
+<edge source="JACK" target="CHLOE"><data key="d0">1</data></edge>
+<edge source="JACK" target="LEADER"><data key="d0">1</data></edge>
+<edge source="JACK" target="BUSINESS WOMAN"><data key="d0">1</data></edge>
+<edge source="JACK" target="BUSISNESS WOMAN"><data key="d0">1</data></edge>
+<edge source="JACK" target="SECURITY TFM"><data key="d0">1</data></edge>
+<edge source="JACK" target="DOORMAN"><data key="d0">1</data></edge>
+<edge source="JACK" target="OPPONENT"><data key="d0">1</data></edge>
+<edge source="JACK" target="DETECTIVE STERN"><data key="d0">1</data></edge>
+<edge source="JACK" target="CLERK"><data key="d0">1</data></edge>
+<edge source="JACK" target="RAYMOND"><data key="d0">1</data></edge>
+<edge source="JACK" target="OTHERS TOGETHER"><data key="d0">1</data></edge>
+<edge source="JACK" target="VALET"><data key="d0">1</data></edge>
+<edge source="JACK" target="RICKY AND MECHANIC"><data key="d0">1</data></edge>
+<edge source="JACK" target="ALL SPACE MONKEYS"><data key="d0">1</data></edge>
+<edge source="JACK" target="BARTENDER"><data key="d0">1</data></edge>
+<edge source="JACK" target="BANDAGED PROPRIETOR"><data key="d0">1</data></edge>
+<edge source="JACK" target="KITCHEN WORKERS"><data key="d0">1</data></edge>
+<edge source="JACK" target="WOUNDED BARTENDER"><data key="d0">1</data></edge>
+<edge source="JACK" target="DESK CLERK"><data key="d0">1</data></edge>
+<edge source="JACK" target="DIFFERENT VOICE"><data key="d0">1</data></edge>
+<edge source="JACK" target="WAITER"><data key="d0">1</data></edge>
+<edge source="JACK" target="BALD DETECTIVE"><data key="d0">1</data></edge>
+<edge source="JACK" target="BALDY"><data key="d0">1</data></edge>
+<edge source="JACK" target="REDHEAD"><data key="d0">1</data></edge>
+<edge source="JACK" target="REDHEAD DETECTIVE"><data key="d0">1</data></edge>
+<edge source="JACK" target="STERN"><data key="d0">1</data></edge>
+<edge source="JACK" target="JACK_TYLER_SPLIT"><data key="d0">1</data></edge>
+<edge source="JACK" target="SHORT SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="JACK" target="TALL SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="TYLER" target="MARLA"><data key="d0">6</data></edge>
+<edge source="TYLER" target="BUSINESS WOMAN"><data key="d0">1</data></edge>
+<edge source="TYLER" target="BUSISNESS WOMAN"><data key="d0">1</data></edge>
+<edge source="TYLER" target="GOATEED MAN"><data key="d0">1</data></edge>
+<edge source="TYLER" target="OPPONENT"><data key="d0">1</data></edge>
+<edge source="TYLER" target="DETECTIVE STERN"><data key="d0">1</data></edge>
+<edge source="TYLER" target="LOU"><data key="d0">1</data></edge>
+<edge source="TYLER" target="CLERK"><data key="d0">1</data></edge>
+<edge source="TYLER" target="RAYMOND"><data key="d0">1</data></edge>
+<edge source="TYLER" target="BOB"><data key="d0">1</data></edge>
+<edge source="TYLER" target="JACOBS"><data key="d0">1</data></edge>
+<edge source="TYLER" target="VALET"><data key="d0">1</data></edge>
+<edge source="TYLER" target="MECHANIC"><data key="d0">1</data></edge>
+<edge source="TYLER" target="RICKY"><data key="d0">1</data></edge>
+<edge source="TYLER" target="RICKY AND MECHANIC"><data key="d0">1</data></edge>
+<edge source="TYLER" target="ANOTHER SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="TYLER" target="JACK_TYLER_SPLIT"><data key="d0">1</data></edge>
+<edge source="TYLER" target="SHORT SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="TYLER" target="TALL SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="MARLA" target="CHLOE"><data key="d0">1</data></edge>
+<edge source="MARLA" target="LEADER"><data key="d0">1</data></edge>
+<edge source="MARLA" target="COP"><data key="d0">1</data></edge>
+<edge source="MARLA" target="DETECTIVE STERN"><data key="d0">1</data></edge>
+<edge source="MARLA" target="BOSS"><data key="d0">1</data></edge>
+<edge source="MARLA" target="WAITER"><data key="d0">1</data></edge>
+<edge source="MARLA" target="ANOTHER SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="MARLA" target="JACK_TYLER_SPLIT"><data key="d0">1</data></edge>
+<edge source="MARLA" target="SHORT SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="MARLA" target="TALL SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="BOSS" target="WALTER"><data key="d0">1</data></edge>
+<edge source="BOB" target="EVERYONE"><data key="d0">1</data></edge>
+<edge source="BOB" target="LEADER"><data key="d0">1</data></edge>
+<edge source="BOB" target="SPEAKER"><data key="d0">1</data></edge>
+<edge source="BOB" target="ANGEL FACE"><data key="d0">1</data></edge>
+<edge source="BOB" target="OTHERS TOGETHER"><data key="d0">1</data></edge>
+<edge source="BOB" target="RICKY"><data key="d0">1</data></edge>
+<edge source="BOB" target="JACOBS"><data key="d0">1</data></edge>
+<edge source="ANGEL FACE" target="RICKY"><data key="d0">2</data></edge>
+<edge source="ANGEL FACE" target="OTHERS TOGETHER"><data key="d0">1</data></edge>
+<edge source="ANGEL FACE" target="ALL SPACE MONKEYS"><data key="d0">1</data></edge>
+<edge source="ANGEL FACE" target="ANOTHER SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="ANGEL FACE" target="MECHANIC"><data key="d0">1</data></edge>
+<edge source="RICKY" target="MECHANIC"><data key="d0">2</data></edge>
+<edge source="RICKY" target="OTHERS TOGETHER"><data key="d0">1</data></edge>
+<edge source="RICKY" target="RICKY AND MECHANIC"><data key="d0">1</data></edge>
+<edge source="RICKY" target="ALL SPACE MONKEYS"><data key="d0">1</data></edge>
+<edge source="RICKY" target="ANOTHER SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="MECHANIC" target="RICKY AND MECHANIC"><data key="d0">1</data></edge>
+<edge source="MECHANIC" target="ALL SPACE MONKEYS"><data key="d0">1</data></edge>
+<edge source="MECHANIC" target="ANOTHER SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="EVERYONE" target="LEADER"><data key="d0">2</data></edge>
+<edge source="EVERYONE" target="SPEAKER"><data key="d0">1</data></edge>
+<edge source="EVERYONE" target="CHLOE"><data key="d0">1</data></edge>
+<edge source="LEADER" target="CHLOE"><data key="d0">2</data></edge>
+<edge source="LEADER" target="SPEAKER"><data key="d0">1</data></edge>
+<edge source="ANOTHER SPACE MONKEY" target="ALL SPACE MONKEYS"><data key="d0">1</data></edge>
+<edge source="ANOTHER SPACE MONKEY" target="JACK_TYLER_SPLIT"><data key="d0">1</data></edge>
+<edge source="ANOTHER SPACE MONKEY" target="SHORT SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="ANOTHER SPACE MONKEY" target="TALL SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="BUSINESS WOMAN" target="BUSISNESS WOMAN"><data key="d0">1</data></edge>
+<edge source="FIRST MAN" target="SECOND MAN"><data key="d0">1</data></edge>
+<edge source="FIRST MAN" target="SEMINARIAN"><data key="d0">1</data></edge>
+<edge source="SECOND MAN" target="SEMINARIAN"><data key="d0">1</data></edge>
+<edge source="CLERK" target="RAYMOND"><data key="d0">1</data></edge>
+<edge source="KITCHEN WORKERS" target="WOUNDED BARTENDER"><data key="d0">1</data></edge>
+<edge source="BALD DETECTIVE" target="BALDY"><data key="d0">1</data></edge>
+<edge source="BALD DETECTIVE" target="REDHEAD"><data key="d0">1</data></edge>
+<edge source="BALD DETECTIVE" target="REDHEAD DETECTIVE"><data key="d0">1</data></edge>
+<edge source="BALD DETECTIVE" target="STERN"><data key="d0">1</data></edge>
+<edge source="BALDY" target="REDHEAD"><data key="d0">1</data></edge>
+<edge source="BALDY" target="REDHEAD DETECTIVE"><data key="d0">1</data></edge>
+<edge source="BALDY" target="STERN"><data key="d0">1</data></edge>
+<edge source="REDHEAD" target="REDHEAD DETECTIVE"><data key="d0">1</data></edge>
+<edge source="REDHEAD" target="STERN"><data key="d0">1</data></edge>
+<edge source="REDHEAD DETECTIVE" target="STERN"><data key="d0">1</data></edge>
+<edge source="JACK_TYLER_SPLIT" target="SHORT SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="JACK_TYLER_SPLIT" target="TALL SPACE MONKEY"><data key="d0">1</data></edge>
+<edge source="SHORT SPACE MONKEY" target="TALL SPACE MONKEY"><data key="d0">1</data></edge>
+</graph></graphml>`;
+
+// ===== PARSE GRAPHML =====
+function parseGraphML(xmlStr) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlStr, 'application/xml');
+  const nodes = [];
+  const edges = [];
+  const nodeMap = {};
+
+  doc.querySelectorAll('node').forEach(n => {
+    let id = n.getAttribute('id');
+    if (!nodeMap[id]) {
+      nodeMap[id] = { id, label: id === 'JACK_TYLER_SPLIT' ? 'JACK/TYLER' : id };
+      nodes.push(nodeMap[id]);
+    }
+  });
+
+  doc.querySelectorAll('edge').forEach(e => {
+    const src = e.getAttribute('source');
+    const tgt = e.getAttribute('target');
+    const wEl = e.querySelector('data[key="d0"]');
+    const weight = wEl ? parseInt(wEl.textContent) : 1;
+    if (nodeMap[src] && nodeMap[tgt]) {
+      edges.push({ source: src, target: tgt, weight });
+    }
+  });
+
+  return { nodes, edges, nodeMap };
+}
+
+// ===== SNA METRICS =====
+function computeMetrics(nodes, edges) {
+  const n = nodes.length;
+  const adj = {};
+  const adjW = {};
+  nodes.forEach(nd => { adj[nd.id] = []; adjW[nd.id] = {}; });
+
+  edges.forEach(e => {
+    adj[e.source].push(e.target);
+    adj[e.target].push(e.source);
+    adjW[e.source][e.target] = (adjW[e.source][e.target] || 0) + e.weight;
+    adjW[e.target][e.source] = (adjW[e.target][e.source] || 0) + e.weight;
+  });
+
+  // Weighted Degree
+  const degree = {};
+  nodes.forEach(nd => {
+    degree[nd.id] = Object.values(adjW[nd.id]).reduce((a,b) => a+b, 0);
+  });
+
+  // BFS distances (unweighted)
+  function bfs(startId) {
+    const dist = {};
+    nodes.forEach(nd => dist[nd.id] = Infinity);
+    dist[startId] = 0;
+    const queue = [startId];
+    while (queue.length) {
+      const u = queue.shift();
+      for (const v of adj[u]) {
+        if (dist[v] === Infinity) { dist[v] = dist[u] + 1; queue.push(v); }
+      }
+    }
+    return dist;
+  }
+
+  // Betweenness (Brandes)
+  const betweenness = {};
+  nodes.forEach(nd => betweenness[nd.id] = 0);
+
+  nodes.forEach(s => {
+    const stack = [];
+    const pred = {};
+    nodes.forEach(nd => pred[nd.id] = []);
+    const sigma = {};
+    nodes.forEach(nd => sigma[nd.id] = 0);
+    sigma[s.id] = 1;
+    const dist = {};
+    nodes.forEach(nd => dist[nd.id] = -1);
+    dist[s.id] = 0;
+    const queue = [s.id];
+    while (queue.length) {
+      const v = queue.shift();
+      stack.push(v);
+      for (const w of adj[v]) {
+        if (dist[w] < 0) { queue.push(w); dist[w] = dist[v] + 1; }
+        if (dist[w] === dist[v] + 1) { sigma[w] += sigma[v]; pred[w].push(v); }
+      }
+    }
+    const delta = {};
+    nodes.forEach(nd => delta[nd.id] = 0);
+    while (stack.length) {
+      const w = stack.pop();
+      for (const v of pred[w]) {
+        delta[v] += (sigma[v] / sigma[w]) * (1 + delta[w]);
+      }
+      if (w !== s.id) betweenness[w] += delta[w];
+    }
+  });
+
+  const normBC = (n - 1) * (n - 2) / 2;
+  nodes.forEach(nd => betweenness[nd.id] = normBC > 0 ? betweenness[nd.id] / normBC : 0);
+
+  // Closeness
+  const closeness = {};
+  nodes.forEach(nd => {
+    const dist = bfs(nd.id);
+    const sum = Object.values(dist).filter(d => d < Infinity && d > 0).reduce((a,b) => a+b, 0);
+    const reachable = Object.values(dist).filter(d => d < Infinity && d > 0).length;
+    closeness[nd.id] = sum > 0 ? reachable / sum : 0;
+  });
+
+  // PageRank
+  const d = 0.85;
+  const pr = {};
+  nodes.forEach(nd => pr[nd.id] = 1/n);
+  for (let iter = 0; iter < 20; iter++) {
+    const newPR = {};
+    nodes.forEach(nd => newPR[nd.id] = (1 - d) / n);
+    nodes.forEach(nd => {
+      const out = adj[nd.id].length;
+      if (out > 0) {
+        adj[nd.id].forEach(nb => { newPR[nb] += d * pr[nd.id] / out; });
+      } else {
+        nodes.forEach(nd2 => { newPR[nd2.id] += d * pr[nd.id] / n; });
+      }
+    });
+    nodes.forEach(nd => pr[nd.id] = newPR[nd.id]);
+  }
+
+  // Local Clustering
+  const clustering = {};
+  nodes.forEach(nd => {
+    const nbrs = adj[nd.id];
+    const k = nbrs.length;
+    if (k < 2) { clustering[nd.id] = 0; return; }
+    let triangles = 0;
+    for (let i = 0; i < nbrs.length; i++) {
+      for (let j = i + 1; j < nbrs.length; j++) {
+        if (adj[nbrs[i]].includes(nbrs[j])) triangles++;
+      }
+    }
+    clustering[nd.id] = 2 * triangles / (k * (k - 1));
+  });
+
+  // Community detection (Louvain modularity optimization)
+  const communities = louvainCommunity(nodes, edges);
+
+  // Density
+  const density = 2 * edges.length / (n * (n - 1));
+
+  return { degree, betweenness, closeness, pagerank: pr, clustering, communities, density, adj, adjW };
+}
+
+function louvainCommunity(nodes, edges) {
+  // Phase-1 Louvain: greedy modularity optimization (deterministic iteration order)
+  const nodeIds = nodes.map(n => n.id);
+
+  // Weighted adjacency
+  const W = {};
+  nodeIds.forEach(id => W[id] = {});
+  edges.forEach(e => {
+    W[e.source][e.target] = (W[e.source][e.target] || 0) + e.weight;
+    W[e.target][e.source] = (W[e.target][e.source] || 0) + e.weight;
+  });
+
+  const m = Math.max(1, edges.reduce((s, e) => s + e.weight, 0));
+
+  // Node strength (weighted degree)
+  const ki = {};
+  nodeIds.forEach(id => {
+    ki[id] = Object.values(W[id]).reduce((s, v) => s + v, 0);
+  });
+
+  // Initialize: each node in its own community
+  const comm = {};
+  nodeIds.forEach(id => comm[id] = id);
+
+  // Community stats: sigma_tot = sum of ki, sigma_in = 2 * internal edge weights
+  const sigma_tot = {}, sigma_in = {};
+  nodeIds.forEach(id => { sigma_tot[id] = ki[id]; sigma_in[id] = 0; });
+
+  let changed = true;
+  let iter = 0;
+  while (changed && iter < 150) {
+    changed = false;
+    iter++;
+    for (const i of nodeIds) {
+      const ci = comm[i];
+      const ki_i = ki[i];
+
+      // Aggregate weights from i to each neighboring community
+      const w_to = {};
+      for (const [j, w] of Object.entries(W[i])) {
+        const cj = comm[j];
+        w_to[cj] = (w_to[cj] || 0) + w;
+      }
+      const w_ci = w_to[ci] || 0;
+
+      // Temporarily remove i from ci
+      sigma_in[ci] -= 2 * w_ci;
+      sigma_tot[ci] -= ki_i;
+
+      // ΔQ(i→c) = w_ic/m − ki*(sigma_tot[c])/(2m²), maximize over candidate communities
+      // baseline: gain for returning to ci (now excluding i)
+      const gain_ci = w_ci / m - ki_i * sigma_tot[ci] / (2 * m * m);
+
+      let bestComm = ci, bestGain = 0;
+      for (const [nc, w_nc] of Object.entries(w_to)) {
+        if (nc === ci) continue;
+        const gain = w_nc / m - ki_i * (sigma_tot[nc] || 0) / (2 * m * m) - gain_ci;
+        if (gain > bestGain) { bestGain = gain; bestComm = nc; }
+      }
+
+      // Move i to bestComm
+      sigma_in[bestComm] = (sigma_in[bestComm] || 0) + 2 * (w_to[bestComm] || 0);
+      sigma_tot[bestComm] = (sigma_tot[bestComm] || 0) + ki_i;
+      comm[i] = bestComm;
+      if (bestComm !== ci) changed = true;
+    }
+  }
+
+  // Sort communities by size descending → index 0 = largest
+  const groups = {};
+  nodeIds.forEach(id => { const c = comm[id]; (groups[c] = groups[c] || []).push(id); });
+  const sortedComms = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length);
+  const commMap = {};
+  sortedComms.forEach((c, i) => commMap[c] = i);
+
+  const result = {};
+  nodeIds.forEach(id => result[id] = commMap[comm[id]]);
+  return result;
+}
+
+// Community identity rules — matched in order against community members
+const COMM_IDENTITY_RULES = [
+  { keys: ['JACK', 'TYLER', 'MARLA'],            name: 'Triada Władzy',       color: '#e02010' },
+  { keys: ['ANGEL FACE', 'RICKY', 'MECHANIC'],   name: 'Space Monkeys',       color: '#4a7fc0' },
+  { keys: ['EVERYONE', 'LEADER', 'CHLOE', 'SPEAKER', 'BOB'], name: 'Grupy Wsparcia', color: '#c8960a' },
+  { keys: ['BALD DETECTIVE','BALDY','REDHEAD','STERN','DETECTIVE STERN','COP'], name: 'Aparat Państwa', color: '#5a8a50' },
+  { keys: ['FIRST MAN', 'SECOND MAN', 'SEMINARIAN'], name: 'Epizodyczne',     color: '#8a5a30' },
+];
+const FALLBACK_COLORS = ['#9040a0','#c06030','#507070','#6a5040','#3a6070','#7a4060'];
+
+// Assign name+color to each community index based on which key characters are in it
+function buildCommunityInfo(nodes, communities) {
+  const groups = {};
+  nodes.forEach(n => { const c = communities[n.id]; (groups[c] = groups[c] || []).push(n.id); });
+  const info = {};
+  let fallbackIdx = 0;
+  // Sort by community index so assignment is stable
+  Object.keys(groups).map(Number).sort((a,b) => a-b).forEach(c => {
+    const members = groups[c];
+    let matched = false;
+    for (const rule of COMM_IDENTITY_RULES) {
+      if (rule.keys.some(k => members.includes(k))) {
+        info[c] = { name: rule.name, color: rule.color };
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      info[c] = { name: 'Peryferia Narracyjne', color: FALLBACK_COLORS[fallbackIdx++ % FALLBACK_COLORS.length] };
+    }
+  });
+  return info;
+}
+
+// ===== MAIN =====
+const { nodes, edges, nodeMap } = parseGraphML(GRAPHML_DATA);
+const { degree, betweenness, closeness, pagerank, clustering, communities, density, adj, adjW } = computeMetrics(nodes, edges);
+
+// Build community info (name + color) from Louvain output
+const communityInfo = buildCommunityInfo(nodes, communities);
+const numCommunities = Object.keys(communityInfo).length;
+
+nodes.forEach(nd => {
+  nd.community = communities[nd.id];
+  nd.color = communityInfo[nd.community] ? communityInfo[nd.community].color : '#888';
+  nd.commName = communityInfo[nd.community] ? communityInfo[nd.community].name : 'Inne';
+  nd.degree = degree[nd.id];
+  nd.betweenness = betweenness[nd.id];
+  nd.closeness = closeness[nd.id];
+  nd.pagerank = pagerank[nd.id];
+  nd.clustering = clustering[nd.id];
+});
+
+// Normalize metrics for visual scaling
+function normalizeMetric(key, nodes) {
+  const vals = nodes.map(n => n[key]);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  return id => max > min ? (nodes.find(n=>n.id===id)[key] - min) / (max - min) : 0.5;
+}
+
+const normDeg = normalizeMetric('degree', nodes);
+const normBet = normalizeMetric('betweenness', nodes);
+const normClo = normalizeMetric('closeness', nodes);
+const normPR  = normalizeMetric('pagerank', nodes);
+
+function getNodeRadius(node, mode) {
+  const base = 5, range = 22;
+  let norm;
+  if (mode === 'degree') norm = normDeg(node.id);
+  else if (mode === 'betweenness') norm = normBet(node.id);
+  else if (mode === 'closeness') norm = normClo(node.id);
+  else if (mode === 'pagerank') norm = normPR(node.id);
+  else norm = normDeg(node.id);
+  return base + norm * range;
+}
+
+// Update stats
+document.getElementById('s-nodes').textContent = nodes.length;
+document.getElementById('s-edges').textContent = edges.length;
+document.getElementById('s-density').textContent = density.toFixed(3);
+document.getElementById('s-comms').textContent = numCommunities;
+document.getElementById('interp-nodes').textContent = nodes.length;
+document.getElementById('interp-edges').textContent = edges.length;
+document.getElementById('interp-density').textContent = density.toFixed(3);
+document.getElementById('interp-comms').textContent = numCommunities;
+
+// ===== BUILD LEGEND =====
+const commCounts = {};
+nodes.forEach(n => commCounts[n.community] = (commCounts[n.community] || 0) + 1);
+
+const legendEl = document.getElementById('legend-items');
+Object.keys(commCounts).map(Number).sort((a,b)=>a-b).forEach(ci => {
+  const info = communityInfo[ci] || { name: 'Inne', color: '#888' };
+  const div = document.createElement('div');
+  div.className = 'legend-item';
+  div.innerHTML = `<div class="legend-dot" style="background:${info.color}"></div>
+    <div class="legend-label">${info.name}</div>
+    <div class="legend-count">${commCounts[ci]}</div>`;
+  div.addEventListener('click', () => filterRankByCommunity(ci));
+  legendEl.appendChild(div);
+});
+
+// ===== STATE VARIABLES (must be declared before simulation) =====
+let currentMode = 'degree';
+let selectedNode = null;
+let clusterMode = false;
+const clusterTargets = {};
+
+function initClusterTargets() {
+  // Arrange community centroids in a circle, largest community at top
+  const uniqueComms = [...new Set(nodes.map(n => n.community))].sort((a, b) => {
+    const sa = nodes.filter(n => n.community === a).length;
+    const sb = nodes.filter(n => n.community === b).length;
+    return sb - sa;
+  });
+  const nc = uniqueComms.length;
+  const radius = Math.min(width, height) * 0.30;
+  uniqueComms.forEach((c, i) => {
+    const angle = (2 * Math.PI * i / nc) - Math.PI / 2;
+    clusterTargets[c] = {
+      x: width / 2 + radius * Math.cos(angle),
+      y: height / 2 + radius * Math.sin(angle)
+    };
+  });
+}
+
+function clusterForce(alpha) {
+  nodes.forEach(n => {
+    const t = clusterTargets[n.community];
+    if (!t) return;
+    n.vx += (t.x - n.x) * 0.45 * alpha;
+    n.vy += (t.y - n.y) * 0.45 * alpha;
+  });
+}
+
+function toggleClusterLayout() {
+  clusterMode = !clusterMode;
+  const btn = document.getElementById('layout-btn');
+  if (clusterMode) {
+    initClusterTargets();
+    simulation.force('cluster', clusterForce);
+    simulation.force('charge').strength(-35);
+    simulation.force('link').distance(() => 25).strength(0.15);
+    btn.classList.add('active');
+  } else {
+    simulation.force('cluster', null);
+    simulation.force('charge').strength(-180);
+    simulation.force('link')
+      .distance(d => Math.max(40, 200 / (1 + d.weight * 0.2)))
+      .strength(0.5);
+    btn.classList.remove('active');
+  }
+  simulation.alphaTarget(0.3).restart();
+  setTimeout(() => simulation.alphaTarget(0), 2800);
+}
+
+// ===== D3 FORCE GRAPH =====
+const svg = d3.select('#graph-svg');
+const container = document.getElementById('graph-container');
+
+let width = container.clientWidth;
+let height = container.clientHeight;
+
+svg.attr('width', width).attr('height', height);
+
+const g = svg.append('g');
+
+// Zoom
+const zoom = d3.zoom().scaleExtent([0.2, 4]).on('zoom', e => g.attr('transform', e.transform));
+svg.call(zoom).on('dblclick.zoom', null);
+
+svg.on('click', function(e) {
+  if (e.target === this || e.target.tagName === 'svg') resetHighlight();
+});
+
+// Weight range for edge styling
+const weights = edges.map(e => e.weight);
+const wMin = Math.min(...weights), wMax = Math.max(...weights);
+const wScale = d3.scaleLinear().domain([wMin, wMax]).range([0.4, 4]);
+const wOpacity = d3.scaleLinear().domain([wMin, wMax]).range([0.15, 0.8]);
+
+// Build link objects
+const linkData = edges.map(e => ({
+  source: e.source, target: e.target, weight: e.weight,
+  strokeWidth: wScale(e.weight),
+  opacity: wOpacity(e.weight)
+}));
+
+const simulation = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(linkData).id(d => d.id).distance(d => {
+    const w = d.weight;
+    return Math.max(40, 200 / (1 + w * 0.2));
+  }).strength(0.5))
+  .force('charge', d3.forceManyBody().strength(-180))
+  .force('center', d3.forceCenter(width / 2, height / 2))
+  .force('collision', d3.forceCollide().radius(d => getNodeRadius(d, currentMode) + 5));
+
+const linkSel = g.append('g').selectAll('line')
+  .data(linkData).join('line')
+  .attr('stroke', '#3a2820')
+  .attr('stroke-width', d => d.strokeWidth)
+  .attr('stroke-opacity', d => d.opacity);
+
+const nodeGroup = g.append('g').selectAll('g')
+  .data(nodes).join('g')
+  .attr('class', 'node-g')
+  .call(d3.drag()
+    .on('start', dragStart)
+    .on('drag', dragged)
+    .on('end', dragEnd));
+
+const circSel = nodeGroup.append('circle')
+  .attr('r', d => getNodeRadius(d, 'degree'))
+  .attr('fill', d => d.color)
+  .attr('stroke', 'rgba(0,0,0,0.5)')
+  .attr('stroke-width', 1);
+
+const labelSel = nodeGroup.append('text')
+  .text(d => d.label)
+  .attr('text-anchor', 'middle')
+  .attr('dy', d => getNodeRadius(d, 'degree') + 9)
+  .attr('font-family', "'Oswald', sans-serif")
+  .attr('font-weight', '400')
+  .attr('fill', '#b0a090')
+  .attr('font-size', d => {
+    const r = getNodeRadius(d, 'degree');
+    return Math.max(7, Math.min(11, r * 0.6)) + 'px';
+  })
+  .attr('pointer-events', 'none')
+  .attr('letter-spacing', '0.05em');
+
+// Tooltip
+const tooltip = document.getElementById('tooltip');
+nodeGroup.on('mousemove', function(e, d) {
+  tooltip.style.display = 'block';
+  tooltip.style.left = (e.clientX + 14) + 'px';
+  tooltip.style.top = (e.clientY - 10) + 'px';
+  document.getElementById('tt-name').textContent = d.label;
+  document.getElementById('tt-deg').textContent = d.degree;
+  document.getElementById('tt-bet').textContent = d.betweenness.toFixed(4);
+  document.getElementById('tt-pr').textContent = d.pagerank.toFixed(4);
+}).on('mouseleave', () => { tooltip.style.display = 'none'; });
+
+nodeGroup.on('click', function(e, d) {
+  e.stopPropagation();
+  highlightNode(d);
+  showNodeCard(d);
+});
+
+simulation.on('tick', () => {
+  linkSel
+    .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+  nodeGroup.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+
+// Auto-fit after simulation
+setTimeout(() => {
+  simulation.alphaTarget(0).restart();
+  setTimeout(() => autoFit(), 3000);
+}, 100);
+
+function autoFit() {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  nodes.forEach(n => {
+    if (n.x < minX) minX = n.x;
+    if (n.x > maxX) maxX = n.x;
+    if (n.y < minY) minY = n.y;
+    if (n.y > maxY) maxY = n.y;
+  });
+  const padded = 60;
+  const scaleX = (width - padded * 2) / (maxX - minX || 1);
+  const scaleY = (height - padded * 2) / (maxY - minY || 1);
+  const scale = Math.min(scaleX, scaleY, 2);
+  const tx = width / 2 - scale * (minX + maxX) / 2;
+  const ty = height / 2 - scale * (minY + maxY) / 2;
+  svg.transition().duration(1200).call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+}
+
+// Drag
+function dragStart(e, d) { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
+function dragged(e, d) { d.fx = e.x; d.fy = e.y; }
+function dragEnd(e, d) { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }
+
+// ===== MODE CONTROLS =====
+
+document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    if (mode === 'reset') {
+      currentMode = 'degree';
+      document.querySelectorAll('.mode-btn[data-mode]').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-mode="degree"]').classList.add('active');
+    } else {
+      currentMode = mode;
+      document.querySelectorAll('.mode-btn[data-mode]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+    updateNodeSizes();
+  });
+});
+
+document.getElementById('layout-btn').addEventListener('click', toggleClusterLayout);
+
+function updateNodeSizes() {
+  circSel.transition().duration(500)
+    .attr('r', d => getNodeRadius(d, currentMode));
+  labelSel.transition().duration(500)
+    .attr('dy', d => getNodeRadius(d, currentMode) + 9)
+    .attr('font-size', d => {
+      const r = getNodeRadius(d, currentMode);
+      return Math.max(7, Math.min(11, r * 0.6)) + 'px';
+    });
+  simulation.force('collision', d3.forceCollide().radius(d => getNodeRadius(d, currentMode) + 4));
+  simulation.alphaTarget(0.1).restart();
+  setTimeout(() => simulation.alphaTarget(0), 800);
+}
+
+// ===== HIGHLIGHT =====
+
+function highlightNode(d) {
+  selectedNode = d;
+  const neighborSet = new Set(adj[d.id]);
+  neighborSet.add(d.id);
+
+  nodeGroup.transition().duration(200)
+    .attr('opacity', nd => neighborSet.has(nd.id) ? 1 : 0.07);
+
+  linkSel.transition().duration(200)
+    .attr('stroke-opacity', l =>
+      (l.source.id === d.id || l.target.id === d.id) ? 0.9 : 0.03);
+
+  circSel.attr('stroke', nd => nd.id === d.id ? '#e8b020' : 'rgba(0,0,0,0.5)')
+         .attr('stroke-width', nd => nd.id === d.id ? 2.5 : 1);
+}
+
+function resetHighlight() {
+  selectedNode = null;
+  nodeGroup.transition().duration(200).attr('opacity', 1);
+  linkSel.transition().duration(200).attr('stroke-opacity', d => d.opacity);
+  circSel.attr('stroke', 'rgba(0,0,0,0.5)').attr('stroke-width', 1);
+  document.getElementById('card-empty').style.display = 'flex';
+  document.getElementById('card-content').style.display = 'none';
+}
+
+// ===== NODE CARD =====
+const metricMaxes = {
+  degree: Math.max(...nodes.map(n => n.degree)),
+  betweenness: Math.max(...nodes.map(n => n.betweenness)),
+  closeness: Math.max(...nodes.map(n => n.closeness)),
+  pagerank: Math.max(...nodes.map(n => n.pagerank)),
+  clustering: 1
+};
+
+function showNodeCard(d) {
+  document.getElementById('card-empty').style.display = 'none';
+  document.getElementById('card-content').style.display = 'block';
+
+  document.getElementById('card-name').textContent = d.label;
+  const tag = document.getElementById('card-community-tag');
+  tag.textContent = d.commName || 'Inne';
+  tag.style.background = d.color + '33';
+  tag.style.color = d.color;
+  tag.style.border = `1px solid ${d.color}66`;
+
+  const metricsEl = document.getElementById('card-metrics');
+  const metricsData = [
+    { label: 'Stopień', val: d.degree, max: metricMaxes.degree, fmt: v => v.toFixed(0) },
+    { label: 'Pośrednictwo', val: d.betweenness, max: metricMaxes.betweenness, fmt: v => v.toFixed(4) },
+    { label: 'Bliskość', val: d.closeness, max: metricMaxes.closeness, fmt: v => v.toFixed(4) },
+    { label: 'PageRank', val: d.pagerank, max: metricMaxes.pagerank, fmt: v => v.toFixed(4) },
+    { label: 'Klasteryzacja', val: d.clustering, max: 1, fmt: v => v.toFixed(3) },
+  ];
+  metricsEl.innerHTML = metricsData.map(m => `
+    <div class="metric-row">
+      <div class="metric-label">${m.label}</div>
+      <div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:${m.max>0?(m.val/m.max*100):0}%;background:${d.color}"></div></div>
+      <div class="metric-value">${m.fmt(m.val)}</div>
+    </div>`).join('');
+
+  // Top connections
+  const conns = Object.entries(adjW[d.id])
+    .sort((a,b) => b[1] - a[1]).slice(0, 5);
+
+  const connEl = document.getElementById('card-connections');
+  connEl.innerHTML = `<div class="connections-title">Najsilniejsze powiązania</div>` +
+    conns.map(([nb, w]) => {
+      const nbNode = nodes.find(n => n.id === nb);
+      const col = nbNode ? nbNode.color : '#888';
+      return `<div class="conn-row"><span style="color:${col}">${nb === 'JACK_TYLER_SPLIT' ? 'JACK/TYLER' : nb}</span><span class="conn-weight">${w}</span></div>`;
+    }).join('');
+}
+
+// ===== RANKING =====
+let currentRankMetric = 'degree';
+let currentFilterComm = null;
+
+function renderRanking() {
+  const metric = currentRankMetric;
+  let sorted = [...nodes].sort((a, b) => b[metric] - a[metric]);
+  if (currentFilterComm !== null) sorted = sorted.filter(n => n.community === currentFilterComm);
+  sorted = sorted.slice(0, 15);
+
+  const maxVal = Math.max(...sorted.map(n => n[metric]));
+  const listEl = document.getElementById('ranking-list');
+  listEl.innerHTML = sorted.map((n, i) => {
+    const pct = maxVal > 0 ? (n[metric] / maxVal * 100) : 0;
+    const fmt = metric === 'degree' ? n[metric].toFixed(0) : n[metric].toFixed(4);
+    return `<div class="rank-row" data-id="${n.id}">
+      <div class="rank-num">${i+1}</div>
+      <div class="rank-dot" style="background:${n.color}"></div>
+      <div class="rank-name">${n.label}</div>
+      <div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:${pct}%;background:${n.color}"></div></div>
+      <div class="rank-val">${fmt}</div>
+    </div>`;
+  }).join('');
+
+  listEl.querySelectorAll('.rank-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const nd = nodes.find(n => n.id === row.dataset.id);
+      if (nd) { highlightNode(nd); showNodeCard(nd); }
+    });
+  });
+}
+
+document.querySelectorAll('.rank-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.rank-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentRankMetric = tab.dataset.rank;
+    renderRanking();
+  });
+});
+
+function filterRankByCommunity(ci) {
+  currentFilterComm = currentFilterComm === ci ? null : ci;
+  renderRanking();
+}
+
+renderRanking();
+
+// Resize
+window.addEventListener('resize', () => {
+  width = container.clientWidth;
+  height = container.clientHeight;
+  svg.attr('width', width).attr('height', height);
+  simulation.force('center', d3.forceCenter(width / 2, height / 2));
+  simulation.alphaTarget(0.05).restart();
+  setTimeout(() => simulation.alphaTarget(0), 500);
+});
+</script>
+</body>
+</html>
