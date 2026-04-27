@@ -1,0 +1,193 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d0" for="edge" attr.name="weight" attr.type="long"/>
+<graph edgedefault="undirected"><node id="BATEMAN"/>
+<node id="PRICE"/>
+<node id="COURTNEY"/>
+<node id="EVELYN"/>
+<node id="CARRUTHERS"/>
+<node id="JEAN"/>
+<node id="KIMBALL"/>
+<node id="CHRISTIE"/>
+<node id="OWEN"/>
+<node id="WAITER"/>
+<node id="DAISY"/>
+<node id="MAN"/>
+<node id="STASH"/>
+<node id="VANDEN"/>
+<node id="VICTORIA"/>
+<node id="SABRINA"/>
+<node id="CARON"/>
+<node id="LIBBY"/>
+<node id="ELIZABETH"/>
+<node id="WOMAN"/>
+<node id="DOORMAN"/>
+<node id="CARNES"/>
+<edge source="BATEMAN" target="PRICE">
+  <data key="d0">6</data>
+</edge>
+<edge source="BATEMAN" target="COURTNEY">
+  <data key="d0">6</data>
+</edge>
+<edge source="BATEMAN" target="EVELYN">
+  <data key="d0">5</data>
+</edge>
+<edge source="BATEMAN" target="CARRUTHERS">
+  <data key="d0">5</data>
+</edge>
+<edge source="BATEMAN" target="JEAN">
+  <data key="d0">4</data>
+</edge>
+<edge source="BATEMAN" target="KIMBALL">
+  <data key="d0">4</data>
+</edge>
+<edge source="BATEMAN" target="CHRISTIE">
+  <data key="d0">4</data>
+</edge>
+<edge source="BATEMAN" target="OWEN">
+  <data key="d0">3</data>
+</edge>
+<edge source="BATEMAN" target="WAITER">
+  <data key="d0">2</data>
+</edge>
+<edge source="BATEMAN" target="DAISY">
+  <data key="d0">2</data>
+</edge>
+<edge source="BATEMAN" target="MAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="BATEMAN" target="STASH">
+  <data key="d0">1</data>
+</edge>
+<edge source="BATEMAN" target="VANDEN">
+  <data key="d0">1</data>
+</edge>
+<edge source="BATEMAN" target="VICTORIA">
+  <data key="d0">1</data>
+</edge>
+<edge source="BATEMAN" target="SABRINA">
+  <data key="d0">1</data>
+</edge>
+<edge source="BATEMAN" target="CARON">
+  <data key="d0">1</data>
+</edge>
+<edge source="BATEMAN" target="LIBBY">
+  <data key="d0">1</data>
+</edge>
+<edge source="BATEMAN" target="ELIZABETH">
+  <data key="d0">1</data>
+</edge>
+<edge source="BATEMAN" target="WOMAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="BATEMAN" target="DOORMAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="BATEMAN" target="CARNES">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="CARRUTHERS">
+  <data key="d0">2</data>
+</edge>
+<edge source="PRICE" target="WAITER">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="COURTNEY">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="EVELYN">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="STASH">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="VANDEN">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="OWEN">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="CARON">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="DAISY">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="KIMBALL">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="LIBBY">
+  <data key="d0">1</data>
+</edge>
+<edge source="PRICE" target="CARNES">
+  <data key="d0">1</data>
+</edge>
+<edge source="COURTNEY" target="CARRUTHERS">
+  <data key="d0">1</data>
+</edge>
+<edge source="COURTNEY" target="EVELYN">
+  <data key="d0">1</data>
+</edge>
+<edge source="COURTNEY" target="STASH">
+  <data key="d0">1</data>
+</edge>
+<edge source="COURTNEY" target="VANDEN">
+  <data key="d0">1</data>
+</edge>
+<edge source="EVELYN" target="CARRUTHERS">
+  <data key="d0">1</data>
+</edge>
+<edge source="EVELYN" target="STASH">
+  <data key="d0">1</data>
+</edge>
+<edge source="EVELYN" target="VANDEN">
+  <data key="d0">1</data>
+</edge>
+<edge source="EVELYN" target="JEAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="CARRUTHERS" target="STASH">
+  <data key="d0">1</data>
+</edge>
+<edge source="CARRUTHERS" target="VANDEN">
+  <data key="d0">1</data>
+</edge>
+<edge source="CARRUTHERS" target="OWEN">
+  <data key="d0">1</data>
+</edge>
+<edge source="JEAN" target="MAN">
+  <data key="d0">1</data>
+</edge>
+<edge source="JEAN" target="KIMBALL">
+  <data key="d0">1</data>
+</edge>
+<edge source="KIMBALL" target="CARON">
+  <data key="d0">1</data>
+</edge>
+<edge source="KIMBALL" target="DAISY">
+  <data key="d0">1</data>
+</edge>
+<edge source="KIMBALL" target="LIBBY">
+  <data key="d0">1</data>
+</edge>
+<edge source="CHRISTIE" target="SABRINA">
+  <data key="d0">1</data>
+</edge>
+<edge source="CHRISTIE" target="ELIZABETH">
+  <data key="d0">1</data>
+</edge>
+<edge source="OWEN" target="WAITER">
+  <data key="d0">1</data>
+</edge>
+<edge source="DAISY" target="CARON">
+  <data key="d0">1</data>
+</edge>
+<edge source="DAISY" target="LIBBY">
+  <data key="d0">1</data>
+</edge>
+<edge source="STASH" target="VANDEN">
+  <data key="d0">1</data>
+</edge>
+<edge source="CARON" target="LIBBY">
+  <data key="d0">1</data>
+</edge>
+</graph></graphml>
