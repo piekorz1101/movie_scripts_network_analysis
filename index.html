@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>American Psycho — Analiza Sieci Postaci</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root {
+  --bg: #050505;
+  --surface: #0c0c0c;
+  --surface2: #111111;
+  --surface3: #161616;
+  --border: #1c1c1c;
+  --border-red: #3a0a0a;
+  --text-primary: #eee8e1;
+  --text-secondary: #8a8279;
+  --text-muted: #3e3a36;
+  --crimson: #9b0000;
+  --crimson-vivid: #cc2200;
+  --crimson-pale: rgba(155,0,0,0.08);
+  --crimson-glow: rgba(204,34,0,0.25);
+  --platinum: #c8bfb4;
+  --c0: #cc2200;
+  --c1: #b09a88;
+  --c2: #5e8fa4;
+  --c3: #7a8f60;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-mono: 'Courier Prime', 'Courier New', monospace;
+  --right-w: 310px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { font-size: 16px; }
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.6;
+}
+
+/* ── HEADER ── */
+#header {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+  height: 80px;
+  position: relative;
+  overflow: hidden;
+}
+#header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--crimson), transparent 60%);
+}
+.header-accent {
+  width: 4px;
+  background: var(--crimson);
+  flex-shrink: 0;
+  position: relative;
+}
+.header-accent::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--crimson);
+  box-shadow: 0 0 20px var(--crimson-glow), 0 0 40px rgba(204,34,0,0.1);
+}
+.header-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 30px;
+  flex: 1;
+}
+.header-title {
+  font-family: var(--font-display);
+  font-size: 1.95rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.header-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--crimson-vivid);
+  margin-top: 6px;
+}
+.header-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 30px;
+  gap: 6px;
+  border-left: 1px solid var(--border);
+}
+.header-meta .year {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+.header-stats {
+  display: flex;
+  gap: 20px;
+}
+.hstat {
+  text-align: right;
+}
+.hstat-val {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+}
+.hstat-label {
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── MAIN LAYOUT ── */
+#main {
+  display: grid;
+  grid-template-columns: 1fr var(--right-w);
+  height: calc(100vh - 80px - 180px);
+  min-height: 500px;
+}
+
+/* ── GRAPH PANEL ── */
+#graph-panel {
+  position: relative;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  background: radial-gradient(ellipse at 40% 50%, #0a0808 0%, var(--bg) 70%);
+}
+
+/* Crosshair decoration */
+#graph-panel::before, #graph-panel::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+#graph-panel::before {
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1px;
+  height: 40px;
+  background: var(--border);
+  opacity: 0.5;
+}
+#graph-panel::after {
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  opacity: 0.5;
+}
+
+#svg-container {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── CONTROLS ── */
+#controls {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  z-index: 10;
+  background: rgba(5,5,5,0.92);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+.mode-btn {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 7px 16px;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+  position: relative;
+}
+.mode-btn:last-child { border-right: none; }
+.mode-btn:hover { color: var(--text-secondary); background: var(--surface); }
+.mode-btn.active {
+  background: var(--crimson);
+  color: var(--text-primary);
+}
+.mode-btn.active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* ── TOOLTIP ── */
+#tooltip {
+  position: fixed;
+  pointer-events: none;
+  display: none;
+  background: rgba(6,6,6,0.97);
+  border: 1px solid var(--border-red);
+  border-left: 3px solid var(--crimson-vivid);
+  padding: 14px 18px;
+  z-index: 2000;
+  min-width: 190px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.8), 0 0 20px rgba(155,0,0,0.08);
+}
+.tt-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 9px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--border-red);
+}
+.tt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0;
+}
+.tt-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.tt-val {
+  font-size: 0.68rem;
+  color: var(--crimson-vivid);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* ── RIGHT PANEL ── */
+#right-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+/* ── NODE CARD ── */
+#node-card {
+  border-bottom: 1px solid var(--border);
+  padding: 18px 20px;
+  flex-shrink: 0;
+  min-height: 155px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+#node-card.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nc-empty-text {
+  font-size: 0.58rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.8;
+}
+.nc-name {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.nc-badge {
+  display: inline-block;
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  margin-bottom: 12px;
+  border-left: 2px solid;
+}
+.nc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.nc-cell {
+  background: var(--surface2);
+  padding: 6px 10px;
+  border-left: 1px solid var(--border-red);
+}
+.nc-cell-label {
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.nc-cell-val {
+  font-size: 0.82rem;
+  color: var(--crimson-vivid);
+  font-weight: 700;
+}
+.nc-connections-label {
+  font-size: 0.52rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.nc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.nc-tag {
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.nc-tag-w {
+  color: var(--crimson);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+/* ── LEGEND ── */
+#legend {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  flex-shrink: 0;
+}
+.legend-title {
+  font-size: 0.53rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  padding: 3px 0;
+  transition: opacity 0.2s;
+}
+.legend-item:hover { opacity: 0.8; }
+.legend-swatch {
+  width: 24px;
+  height: 3px;
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: absolute;
+  left: -3px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+}
+.legend-name {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  flex: 1;
+}
+.legend-desc {
+  font-size: 0.52rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-style: italic;
+  display: block;
+  margin-top: 1px;
+}
+.legend-count {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ── RANKING ── */
+#ranking {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+#ranking-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.rank-tab {
+  flex: 1;
+  padding: 9px 4px;
+  font-family: var(--font-mono);
+  font-size: 0.53rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  border-right: 1px solid var(--border);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.rank-tab:last-child { border-right: none; }
+.rank-tab:hover { color: var(--text-secondary); background: var(--surface2); }
+.rank-tab.active {
+  color: var(--crimson-vivid);
+  border-bottom-color: var(--crimson-vivid);
+  background: var(--surface2);
+}
+#ranking-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+#ranking-list::-webkit-scrollbar { width: 3px; }
+#ranking-list::-webkit-scrollbar-thumb { background: var(--border-red); }
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid transparent;
+}
+.rank-item:hover {
+  background: var(--surface2);
+  border-bottom-color: var(--border);
+}
+.rank-item.highlighted { background: var(--crimson-pale); }
+.rank-num {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  width: 14px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.rank-community-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.rank-name {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  width: 74px;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rank-bar-track {
+  flex: 1;
+  height: 2px;
+  background: var(--surface3);
+  position: relative;
+}
+.rank-bar-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  transition: width 0.5s cubic-bezier(.4,0,.2,1);
+}
+.rank-val {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  width: 40px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── INTERPRETATION ── */
+#interpretation {
+  border-top: 1px solid var(--border);
+  padding: 28px 36px 30px;
+  position: relative;
+  background: var(--surface);
+  flex-shrink: 0;
+  height: 180px;
+}
+#interpretation::before {
+  content: '// INTERPRETACJA STRUKTURALNA';
+  position: absolute;
+  top: -8px;
+  left: 36px;
+  font-size: 0.53rem;
+  letter-spacing: 0.4em;
+  color: var(--crimson);
+  background: var(--surface);
+  padding: 0 12px;
+  text-transform: uppercase;
+}
+.interp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  height: 100%;
+}
+.interp-block { }
+.interp-block h3 {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-red);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.interp-block h3::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  background: var(--crimson-vivid);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.interp-block p {
+  font-size: 0.63rem;
+  line-height: 1.85;
+  color: var(--text-secondary);
+  letter-spacing: 0.015em;
+}
+.interp-block p em {
+  color: var(--crimson-vivid);
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* SVG styles */
+.node-circle { transition: opacity 0.2s; }
+.node-ring { transition: opacity 0.2s; }
+.node-label { 
+  transition: opacity 0.2s, fill 0.2s; 
+  pointer-events: none; 
+  font-weight: 700;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 3px rgba(0,0,0,1); /* Cień zwiększający czytelność */
+}
+.link-line { transition: opacity 0.2s, stroke-opacity 0.2s; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div class="header-accent"></div>
+  <div class="header-main">
+    <div class="header-title">American Psycho</div>
+    <div class="header-subtitle">Analiza Sieci Postaci &nbsp;/&nbsp; Social Network Analysis</div>
+  </div>
+  <div class="header-meta">
+    <div class="year">Mary Harron &nbsp;·&nbsp; 2000</div>
+    <div class="header-stats">
+      <div class="hstat">
+        <div class="hstat-val">22</div>
+        <div class="hstat-label">Węzły</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">55</div>
+        <div class="hstat-label">Krawędzie</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">0.24</div>
+        <div class="hstat-label">Gęstość</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">4</div>
+        <div class="hstat-label">Społeczności</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- GRAPH -->
+  <div id="graph-panel">
+    <div id="controls">
+      <button class="mode-btn active" data-mode="degree">Degree</button>
+      <button class="mode-btn" data-mode="betweenness">Betweenness</button>
+      <button class="mode-btn" data-mode="closeness">Closeness</button>
+      <button class="mode-btn" data-mode="pagerank">PageRank</button>
+    </div>
+    <svg id="svg-container"></svg>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+
+    <!-- NODE CARD -->
+    <div id="node-card" class="empty">
+      <div class="nc-empty-text">← kliknij węzeł<br>aby zobaczyć szczegóły</div>
+    </div>
+
+    <!-- LEGEND -->
+    <div id="legend">
+      <div class="legend-title">Społeczności (Louvain)</div>
+      <div id="legend-items"></div>
+    </div>
+
+    <!-- RANKING -->
+    <div id="ranking">
+      <div id="ranking-tabs">
+        <button class="rank-tab active" data-metric="degree">Degree</button>
+        <button class="rank-tab" data-metric="betweenness">Betw.</button>
+        <button class="rank-tab" data-metric="closeness">Close.</button>
+        <button class="rank-tab" data-metric="pagerank">PR</button>
+      </div>
+      <div id="ranking-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- INTERPRETATION -->
+<div id="interpretation">
+  <div class="interp-grid">
+    <div class="interp-block">
+      <h3>Centralizacja Władzy</h3>
+      <p>Sieć wykazuje ekstremalną centralizację: centralność pośrednicząca BATEMANA wynosi <em>0.687</em> — ponad 6× wyższa od PRICE'a (0.110). Jako jedyny węzeł z istotnym betweenness, Bateman kontroluje przepływ informacji i relacji w sieci. Odpowiada to narracyjnej omnipotencji protagonisty.</p>
+    </div>
+    <div class="interp-block">
+      <h3>Struktura Społeczności</h3>
+      <p>Algorytm Louvain wyodrębnił 4 klastry. <em>Krąg Batemana</em> (10 węzłów) skupia ofiary i świadków. Klaster <em>Elity Finansowej</em> (Price, Kimball, Daisy) łączy postaci statusowe. Subgrupa <em>Sceny Towarzyskiej</em> tworzy gęstą kliczkę — najsilniejszy klaster wewnętrzny poza centrum.</p>
+    </div>
+    <div class="interp-block">
+      <h3>Topologia Sieci</h3>
+      <p>Graf rzadki (density <em>≈ 0.24</em>), o strukturze gwiazdy z jednym dominującym centrum. Krawędzie o wadze 6 (PRICE, COURTNEY) wskazują najczęstsze sceny. Większość węzłów peryferyjna — połączona wyłącznie z Batemanem — tworząc obraz <em>izolacji w tłumie</em>, kluczowej dla tematyki dzieła.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLTIP -->
+<div id="tooltip">
+  <div class="tt-name" id="tt-name"></div>
+  <div class="tt-row"><span class="tt-label">Degree</span><span class="tt-val" id="tt-deg">—</span></div>
+  <div class="tt-row"><span class="tt-label">Betweenness</span><span class="tt-val" id="tt-bet">—</span></div>
+  <div class="tt-row"><span class="tt-label">Closeness</span><span class="tt-val" id="tt-cls">—</span></div>
+  <div class="tt-row"><span class="tt-label">PageRank</span><span class="tt-val" id="tt-pr">—</span></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const COMMUNITY = {
+  0: { color: '#cc2200', name: 'Krąg Batemana',     desc: 'protagonista i ofiary' },
+  1: { color: '#b09a88', name: 'Elita Finansowa',   desc: 'Price, Kimball, Daisy' },
+  2: { color: '#5e8fa4', name: 'Scena Towarzyska',  desc: 'przyjęcia, kolacje, status' },
+  3: { color: '#7a8f60', name: 'Peryferia',          desc: 'pracownicy, drugoplanowi' },
+};
+
+const RAW_NODES = [
+  {id:'BATEMAN',  c:0, bet:0.6873015873, raw:40},
+  {id:'PRICE',    c:1, bet:0.1095238095, raw:28},
+  {id:'COURTNEY', c:2, bet:0,            raw:17.5},
+  {id:'EVELYN',   c:2, bet:0.011111111,  raw:19},
+  {id:'CARRUTHERS',c:2,bet:0.006349206,  raw:19},
+  {id:'JEAN',     c:0, bet:0.006349206,  raw:14.5},
+  {id:'KIMBALL',  c:1, bet:0.008730159,  raw:17.5},
+  {id:'CHRISTIE', c:0, bet:0.002380952,  raw:13},
+  {id:'OWEN',     c:3, bet:0.001587302,  raw:14.5},
+  {id:'WAITER',   c:3, bet:0,            raw:13},
+  {id:'DAISY',    c:1, bet:0,            raw:16},
+  {id:'MAN',      c:0, bet:0,            raw:11.5},
+  {id:'STASH',    c:2, bet:0,            raw:17.5},
+  {id:'VANDEN',   c:2, bet:0,            raw:17.5},
+  {id:'VICTORIA', c:0, bet:0,            raw:10},
+  {id:'SABRINA',  c:0, bet:0,            raw:11.5},
+  {id:'CARON',    c:1, bet:0,            raw:16},
+  {id:'LIBBY',    c:1, bet:0,            raw:16},
+  {id:'ELIZABETH',c:0, bet:0,            raw:11.5},
+  {id:'WOMAN',    c:0, bet:0,            raw:10},
+  {id:'DOORMAN',  c:0, bet:0,            raw:10},
+  {id:'CARNES',   c:0, bet:0,            raw:11.5},
+];
+
+const RAW_EDGES = [
+  {s:'BATEMAN',t:'PRICE',w:6},
+  {s:'BATEMAN',t:'COURTNEY',w:6},
+  {s:'BATEMAN',t:'EVELYN',w:5},
+  {s:'BATEMAN',t:'CARRUTHERS',w:5},
+  {s:'BATEMAN',t:'JEAN',w:4},
+  {s:'BATEMAN',t:'KIMBALL',w:4},
+  {s:'BATEMAN',t:'CHRISTIE',w:4},
+  {s:'BATEMAN',t:'OWEN',w:3},
+  {s:'BATEMAN',t:'WAITER',w:2},
+  {s:'BATEMAN',t:'DAISY',w:2},
+  {s:'BATEMAN',t:'MAN',w:1},
+  {s:'BATEMAN',t:'STASH',w:1},
+  {s:'BATEMAN',t:'VANDEN',w:1},
+  {s:'BATEMAN',t:'VICTORIA',w:1},
+  {s:'BATEMAN',t:'SABRINA',w:1},
+  {s:'BATEMAN',t:'CARON',w:1},
+  {s:'BATEMAN',t:'LIBBY',w:1},
+  {s:'BATEMAN',t:'ELIZABETH',w:1},
+  {s:'BATEMAN',t:'WOMAN',w:1},
+  {s:'BATEMAN',t:'DOORMAN',w:1},
+  {s:'BATEMAN',t:'CARNES',w:1},
+  {s:'PRICE',t:'CARRUTHERS',w:2},
+  {s:'PRICE',t:'WAITER',w:1},
+  {s:'PRICE',t:'COURTNEY',w:1},
+  {s:'PRICE',t:'EVELYN',w:1},
+  {s:'PRICE',t:'STASH',w:1},
+  {s:'PRICE',t:'VANDEN',w:1},
+  {s:'PRICE',t:'OWEN',w:1},
+  {s:'PRICE',t:'CARON',w:1},
+  {s:'PRICE',t:'DAISY',w:1},
+  {s:'PRICE',t:'KIMBALL',w:1},
+  {s:'PRICE',t:'LIBBY',w:1},
+  {s:'PRICE',t:'CARNES',w:1},
+  {s:'COURTNEY',t:'CARRUTHERS',w:1},
+  {s:'COURTNEY',t:'EVELYN',w:1},
+  {s:'COURTNEY',t:'STASH',w:1},
+  {s:'COURTNEY',t:'VANDEN',w:1},
+  {s:'EVELYN',t:'CARRUTHERS',w:1},
+  {s:'EVELYN',t:'STASH',w:1},
+  {s:'EVELYN',t:'VANDEN',w:1},
+  {s:'EVELYN',t:'JEAN',w:1},
+  {s:'CARRUTHERS',t:'STASH',w:1},
+  {s:'CARRUTHERS',t:'VANDEN',w:1},
+  {s:'CARRUTHERS',t:'OWEN',w:1},
+  {s:'JEAN',t:'MAN',w:1},
+  {s:'JEAN',t:'KIMBALL',w:1},
+  {s:'KIMBALL',t:'CARON',w:1},
+  {s:'KIMBALL',t:'DAISY',w:1},
+  {s:'KIMBALL',t:'LIBBY',w:1},
+  {s:'CHRISTIE',t:'SABRINA',w:1},
+  {s:'CHRISTIE',t:'ELIZABETH',w:1},
+  {s:'OWEN',t:'WAITER',w:1},
+  {s:'DAISY',t:'CARON',w:1},
+  {s:'DAISY',t:'LIBBY',w:1},
+  {s:'STASH',t:'VANDEN',w:1},
+  {s:'CARON',t:'LIBBY',w:1},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// BUILD NODE MAP & COMPUTE METRICS
+// ═══════════════════════════════════════════════════════════════
+const nodeMap = {};
+RAW_NODES.forEach(n => {
+  nodeMap[n.id] = {
+    id: n.id, community: n.c, betweenness: n.bet, rawSize: n.raw,
+    neighbors: [], edgeList: [],
+    degree: 0, weightedDeg: 0, closeness: 0, pagerank: 0
+  };
+});
+
+RAW_EDGES.forEach(e => {
+  nodeMap[e.s].neighbors.push(e.t);
+  nodeMap[e.s].edgeList.push({to: e.t, w: e.w});
+  nodeMap[e.t].neighbors.push(e.s);
+  nodeMap[e.t].edgeList.push({to: e.s, w: e.w});
+});
+
+// Degree
+RAW_NODES.forEach(n => {
+  nodeMap[n.id].degree = nodeMap[n.id].neighbors.length;
+  nodeMap[n.id].weightedDeg = nodeMap[n.id].edgeList.reduce((s,e) => s+e.w, 0);
+});
+
+// Closeness (BFS unweighted)
+RAW_NODES.forEach(n => {
+  const dist = {};
+  RAW_NODES.forEach(x => dist[x.id] = Infinity);
+  dist[n.id] = 0;
+  const q = [n.id];
+  while (q.length) {
+    const cur = q.shift();
+    nodeMap[cur].neighbors.forEach(nb => {
+      if (dist[nb] === Infinity) { dist[nb] = dist[cur]+1; q.push(nb); }
+    });
+  }
+  let sum = 0, reach = 0;
+  RAW_NODES.forEach(x => {
+    if (x.id !== n.id && dist[x.id] < Infinity) { sum += dist[x.id]; reach++; }
+  });
+  nodeMap[n.id].closeness = reach > 0 ? reach / sum : 0;
+});
+
+// PageRank
+(function() {
+  const d = 0.85, N = RAW_NODES.length, iters = 150;
+  let pr = {}; RAW_NODES.forEach(n => pr[n.id] = 1/N);
+  for (let i = 0; i < iters; i++) {
+    const npr = {}; RAW_NODES.forEach(n => npr[n.id] = (1-d)/N);
+    RAW_NODES.forEach(n => {
+      const nm = nodeMap[n.id];
+      if (nm.degree === 0) return;
+      nm.neighbors.forEach(nb => { npr[nb] += d * pr[n.id] / nm.degree; });
+    });
+    pr = npr;
+  }
+  RAW_NODES.forEach(n => { nodeMap[n.id].pagerank = pr[n.id]; });
+})();
+
+// Metric ranges
+const METRICS = ['degree','betweenness','closeness','pagerank'];
+const metricRange = {};
+METRICS.forEach(m => {
+  const vals = RAW_NODES.map(n => nodeMap[n.id][m]);
+  metricRange[m] = { min: d3.min(vals), max: d3.max(vals) };
+});
+
+// ═══════════════════════════════════════════════════════════════
+// D3 SETUP
+// ═══════════════════════════════════════════════════════════════
+const nodes = RAW_NODES.map(n => ({...nodeMap[n.id]}));
+const links = RAW_EDGES.map(e => ({source:e.s, target:e.t, weight:e.w}));
+
+const graphPanel = document.getElementById('graph-panel');
+let W = graphPanel.clientWidth;
+let H = graphPanel.clientHeight;
+
+const svg = d3.select('#svg-container')
+  .attr('width', W).attr('height', H);
+
+// Defs: glow filter
+const defs = svg.append('defs');
+const glowFilter = defs.append('filter').attr('id','glow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+glowFilter.append('feGaussianBlur').attr('stdDeviation','3').attr('result','blur');
+const feMerge = glowFilter.append('feMerge');
+feMerge.append('feMergeNode').attr('in','blur');
+feMerge.append('feMergeNode').attr('in','SourceGraphic');
+
+const redGlow = defs.append('filter').attr('id','redglow').attr('x','-80%').attr('y','-80%').attr('width','260%').attr('height','260%');
+redGlow.append('feGaussianBlur').attr('stdDeviation','6').attr('result','rb');
+const rm = redGlow.append('feMerge');
+rm.append('feMergeNode').attr('in','rb');
+rm.append('feMergeNode').attr('in','SourceGraphic');
+
+const g = svg.append('g').attr('class','scene');
+
+// Zoom
+const zoom = d3.zoom()
+  .scaleExtent([0.15, 5])
+  .on('zoom', ev => g.attr('transform', ev.transform));
+svg.call(zoom).on('dblclick.zoom', null);
+
+let currentMetric = 'degree';
+
+// Size scale
+const R_MIN = 7, R_MAX = 38;
+function nodeR(d, metric) {
+  const m = metric || currentMetric;
+  const {min, max} = metricRange[m];
+  if (max === min) return (R_MIN+R_MAX)/2;
+  const t = (d[m] - min) / (max - min);
+  return R_MIN + Math.pow(t, 0.55) * (R_MAX - R_MIN);
+}
+
+const maxW = d3.max(links, l => l.weight);
+const minW = d3.min(links, l => l.weight);
+function edgeW(w) { return 1.5 + ((w-minW)/(maxW-minW)) * 4.5; }
+function edgeOpacity(w) { return 0.25 + ((w-minW)/(maxW-minW)) * 0.35; } // Zmniejszone opacity krawędzi
+
+// Funkcja pomocnicza do pobierania społeczności dla węzłów i obiektów D3
+function getComm(n) { 
+  return typeof n === 'object' ? n.community : nodeMap[n].community; 
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SIMULATION (Zmodyfikowana, by grupować społeczności i rozpraszać)
+// ═══════════════════════════════════════════════════════════════
+const simulation = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(links).id(d=>d.id)
+    // Krawędzie wewnątrz tej samej społeczności są krótsze, a między różnymi - dłuższe (grupowanie)
+    .distance(d => (getComm(d.source) === getComm(d.target) ? 60 : 160) + (maxW - d.weight) * 15)
+    // Silniejsze przyciąganie dla węzłów wewnątrz jednej społeczności
+    .strength(d => (getComm(d.source) === getComm(d.target) ? 0.7 : 0.1) + d.weight * 0.05))
+  // Zwiększony charge na -550 bardziej odpycha/rozprasza cały graf
+  .force('charge', d3.forceManyBody().strength(-550).distanceMax(700))
+  .force('center', d3.forceCenter(W/2, H/2))
+  .force('collision', d3.forceCollide().radius(d => nodeR(d)+25).strength(0.8));
+
+// ═══════════════════════════════════════════════════════════════
+// DRAW LINKS
+// ═══════════════════════════════════════════════════════════════
+const linkG = g.append('g').attr('class','links');
+const linkSel = linkG.selectAll('line')
+  .data(links)
+  .join('line')
+  .attr('class','link-line')
+  .attr('stroke', '#ffffff')
+  .attr('stroke-width', d => edgeW(d.weight))
+  .attr('stroke-opacity', d => edgeOpacity(d.weight));
+
+// ═══════════════════════════════════════════════════════════════
+// DRAW NODES
+// ═══════════════════════════════════════════════════════════════
+const nodeG = g.append('g').attr('class','nodes');
+const nodeSel = nodeG.selectAll('g.node')
+  .data(nodes)
+  .join('g')
+  .attr('class','node')
+  .style('cursor','pointer')
+  .call(d3.drag()
+    .on('start', (ev,d) => { if(!ev.active) simulation.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+    .on('drag',  (ev,d) => { d.fx=ev.x; d.fy=ev.y; })
+    .on('end',   (ev,d) => { if(!ev.active) simulation.alphaTarget(0); d.fx=null; d.fy=null; })
+  );
+
+// Outer pulse ring
+nodeSel.append('circle')
+  .attr('class','node-ring')
+  .attr('r', d => nodeR(d)+5)
+  .attr('fill','none')
+  .attr('stroke', d => COMMUNITY[d.community].color)
+  .attr('stroke-width',1.5)
+  .attr('stroke-opacity',0);
+
+// Main circle
+nodeSel.append('circle')
+  .attr('class','node-circle')
+  .attr('r', d => nodeR(d))
+  .attr('fill', d => COMMUNITY[d.community].color)
+  .attr('fill-opacity', 1)
+  .attr('stroke','none');
+
+// Highlight ring (selected)
+nodeSel.append('circle')
+  .attr('class','node-sel-ring')
+  .attr('r', d => nodeR(d)+3)
+  .attr('fill','none')
+  .attr('stroke','#ffffff')
+  .attr('stroke-width', 1)
+  .attr('stroke-opacity',0);
+
+// Label (Poprawiona czytelność)
+nodeSel.append('text')
+  .attr('class','node-label')
+  .attr('dy', d => nodeR(d)+14)
+  .attr('text-anchor','middle')
+  .attr('font-family','Courier Prime, monospace')
+  .attr('font-size', d => Math.max(9, Math.min(13, nodeR(d)*0.45)))
+  .attr('fill','#ffffff') // Jasny kolor napisu na stałe
+  .attr('letter-spacing','0.08em')
+  .text(d => d.id);
+
+// ═══════════════════════════════════════════════════════════════
+// INTERACTIONS
+// ═══════════════════════════════════════════════════════════════
+let activeNodeId = null;
+
+nodeSel
+  .on('mouseover', (ev,d) => showTip(ev,d))
+  .on('mousemove', (ev)  => moveTip(ev))
+  .on('mouseout',  ()    => hideTip())
+  .on('click', (ev,d) => {
+    ev.stopPropagation();
+    if (activeNodeId === d.id) {
+      resetHL(); showEmptyCard(); activeNodeId = null;
+    } else {
+      activeNodeId = d.id;
+      doHighlight(d);
+      showNodeCard(d);
+    }
+  });
+
+svg.on('click', () => { resetHL(); showEmptyCard(); activeNodeId = null; });
+
+function doHighlight(d) {
+  const nbSet = new Set(nodeMap[d.id].neighbors);
+  nbSet.add(d.id);
+
+  nodeSel.select('.node-circle')
+    .attr('fill-opacity', n => nbSet.has(n.id) ? 1 : 0.15)
+    .attr('filter', n => n.id === d.id ? 'url(#redglow)' : null);
+  nodeSel.select('.node-ring')
+    .attr('stroke-opacity', n => nbSet.has(n.id) && n.id !== d.id ? 0.5 : 0);
+  nodeSel.select('.node-sel-ring')
+    .attr('stroke-opacity', n => n.id === d.id ? 0.9 : 0);
+  nodeSel.select('.node-label')
+    .attr('fill', n => nbSet.has(n.id) ? '#ffffff' : '#4a453f') // Przyciemnia nieaktywne nazwy
+    .attr('font-size', n => {
+      const base = Math.max(9, Math.min(13, nodeR(n)*0.45));
+      return n.id === d.id ? base * 1.2 : base;
+    });
+
+  linkSel
+    .attr('stroke-opacity', l => {
+      const sid = typeof l.source === 'object' ? l.source.id : l.source;
+      const tid = typeof l.target === 'object' ? l.target.id : l.target;
+      if (sid === d.id || tid === d.id) return edgeOpacity(l.weight) * 1.8;
+      return 0.025;
+    })
+    .attr('stroke', l => {
+      const sid = typeof l.source === 'object' ? l.source.id : l.source;
+      const tid = typeof l.target === 'object' ? l.target.id : l.target;
+      if (sid === d.id || tid === d.id) return COMMUNITY[d.community].color;
+      return '#ffffff';
+    });
+}
+
+function resetHL() {
+  nodeSel.select('.node-circle')
+    .attr('fill-opacity', 1)
+    .attr('filter', null);
+  nodeSel.select('.node-ring').attr('stroke-opacity', 0);
+  nodeSel.select('.node-sel-ring').attr('stroke-opacity', 0);
+  nodeSel.select('.node-label')
+    .attr('fill','#ffffff') // Powrót do jasnego koloru dla wszystkich
+    .attr('font-size', d => Math.max(9, Math.min(13, nodeR(d)*0.45)));
+  linkSel
+    .attr('stroke-opacity', d => edgeOpacity(d.weight))
+    .attr('stroke','#ffffff');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SIMULATION TICK
+// ═══════════════════════════════════════════════════════════════
+simulation.on('tick', () => {
+  linkSel
+    .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+  nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+
+// Auto-fit after settle
+setTimeout(() => {
+  const b = g.node().getBBox();
+  if (b.width > 0) {
+    const pad = 60;
+    const s = Math.min(0.85, (W-pad*2)/b.width, (H-pad*2)/b.height);
+    const tx = W/2 - s*(b.x+b.width/2);
+    const ty = H/2 - s*(b.y+b.height/2);
+    svg.transition().duration(1000).ease(d3.easeCubicInOut)
+      .call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(s));
+  }
+}, 2800);
+
+// ═══════════════════════════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════════════════════════
+const tooltip = document.getElementById('tooltip');
+function showTip(ev, d) {
+  document.getElementById('tt-name').textContent = d.id;
+  document.getElementById('tt-deg').textContent = d.degree;
+  document.getElementById('tt-bet').textContent = d.betweenness.toFixed(4);
+  document.getElementById('tt-cls').textContent = d.closeness.toFixed(4);
+  document.getElementById('tt-pr').textContent = d.pagerank.toFixed(5);
+  tooltip.style.display = 'block';
+  moveTip(ev);
+}
+function moveTip(ev) {
+  const x = ev.clientX, y = ev.clientY;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  tooltip.style.left = (x + 16 + 200 > vw ? x - 210 : x + 16) + 'px';
+  tooltip.style.top  = (y + 10 + 140 > vh ? y - 145 : y + 10) + 'px';
+}
+function hideTip() { tooltip.style.display = 'none'; }
+
+// ═══════════════════════════════════════════════════════════════
+// NODE CARD
+// ═══════════════════════════════════════════════════════════════
+function showNodeCard(d) {
+  const card = document.getElementById('node-card');
+  card.classList.remove('empty');
+  const cfg = COMMUNITY[d.community];
+  const sorted = [...nodeMap[d.id].edgeList].sort((a,b) => b.w-a.w);
+  card.innerHTML = `
+    <div class="nc-name">${d.id}</div>
+    <div class="nc-badge" style="color:${cfg.color};background:${cfg.color}18;border-color:${cfg.color}">${cfg.name}</div>
+    <div class="nc-grid">
+      <div class="nc-cell"><div class="nc-cell-label">Degree</div><div class="nc-cell-val">${d.degree}</div></div>
+      <div class="nc-cell"><div class="nc-cell-label">Betweenness</div><div class="nc-cell-val">${d.betweenness.toFixed(4)}</div></div>
+      <div class="nc-cell"><div class="nc-cell-label">Closeness</div><div class="nc-cell-val">${d.closeness.toFixed(4)}</div></div>
+      <div class="nc-cell"><div class="nc-cell-label">PageRank</div><div class="nc-cell-val">${d.pagerank.toFixed(5)}</div></div>
+    </div>
+    <div class="nc-connections-label">Połączenia (${sorted.length})</div>
+    <div class="nc-tags">
+      ${sorted.map(e => `<span class="nc-tag">${e.to}<span class="nc-tag-w">${e.w}</span></span>`).join('')}
+    </div>
+  `;
+}
+
+function showEmptyCard() {
+  const card = document.getElementById('node-card');
+  card.classList.add('empty');
+  card.innerHTML = `<div class="nc-empty-text">← kliknij węzeł<br>aby zobaczyć szczegóły</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LEGEND
+// ═══════════════════════════════════════════════════════════════
+const legendItems = document.getElementById('legend-items');
+Object.entries(COMMUNITY).forEach(([cid, cfg]) => {
+  const count = RAW_NODES.filter(n => n.c === +cid).length;
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.innerHTML = `
+    <div class="legend-swatch" style="background:${cfg.color}"></div>
+    <div style="flex:1;min-width:0">
+      <div class="legend-name">${cfg.name}</div>
+      <span class="legend-desc">${cfg.desc}</span>
+    </div>
+    <div class="legend-count">${count}</div>
+  `;
+  item.addEventListener('click', () => {
+    // Highlight community
+    const communityNodes = nodes.filter(n => n.community === +cid);
+    if (communityNodes.length > 0) {
+      // fake a multi-highlight
+      const nbSet = new Set(communityNodes.map(n => n.id));
+      nodeSel.select('.node-circle').attr('fill-opacity', n => nbSet.has(n.id) ? 1 : 0.15);
+      nodeSel.select('.node-label').attr('fill', n => nbSet.has(n.id) ? '#ffffff' : '#4a453f');
+      linkSel.attr('stroke-opacity', l => {
+        const sid = typeof l.source === 'object' ? l.source.id : l.source;
+        const tid = typeof l.target === 'object' ? l.target.id : l.target;
+        return (nbSet.has(sid) && nbSet.has(tid)) ? edgeOpacity(l.weight)*1.5 : 0.02;
+      });
+      activeNodeId = 'community_'+cid;
+    }
+  });
+  legendItems.appendChild(item);
+});
+
+// ═══════════════════════════════════════════════════════════════
+// RANKING
+// ═══════════════════════════════════════════════════════════════
+function updateRanking(metric) {
+  const list = document.getElementById('ranking-list');
+  const sorted = [...nodes].sort((a,b) => b[metric]-a[metric]);
+  const max = sorted[0][metric] || 1;
+  list.innerHTML = sorted.map((n, i) => {
+    const val = n[metric];
+    const pct = (val / max) * 100;
+    const cfg = COMMUNITY[n.community];
+    const fmt = val < 0.0001 ? val.toFixed(6)
+              : val < 0.001  ? val.toFixed(5)
+              : val < 0.01   ? val.toFixed(4)
+              : val < 1      ? val.toFixed(3)
+              : val.toFixed(0);
+    return `<div class="rank-item${activeNodeId===n.id?' highlighted':''}" data-id="${n.id}">
+      <div class="rank-num">${i+1}</div>
+      <div class="rank-community-dot" style="background:${cfg.color}"></div>
+      <div class="rank-name">${n.id}</div>
+      <div class="rank-bar-track"><div class="rank-bar-fill" style="width:${pct}%;background:${cfg.color}"></div></div>
+      <div class="rank-val">${fmt}</div>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.rank-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const nd = nodes.find(n => n.id === el.dataset.id);
+      if (nd) {
+        activeNodeId = nd.id;
+        doHighlight(nd);
+        showNodeCard(nd);
+      }
+    });
+  });
+}
+
+document.querySelectorAll('.rank-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.rank-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const m = tab.dataset.metric;
+    updateRanking(m);
+    switchMode(m);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// MODE SWITCHING
+// ═══════════════════════════════════════════════════════════════
+function switchMode(metric) {
+  currentMetric = metric;
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === metric);
+  });
+
+  nodeSel.select('.node-circle')
+    .transition().duration(500).ease(d3.easeCubicInOut)
+    .attr('r', d => nodeR(d, metric));
+  nodeSel.select('.node-ring')
+    .transition().duration(500)
+    .attr('r', d => nodeR(d, metric)+5);
+  nodeSel.select('.node-sel-ring')
+    .transition().duration(500)
+    .attr('r', d => nodeR(d, metric)+3);
+  nodeSel.select('.node-label')
+    .transition().duration(500)
+    .attr('dy', d => nodeR(d, metric)+14)
+    .attr('font-size', d => Math.max(9, Math.min(13, nodeR(d, metric)*0.45)));
+
+  simulation.force('collision').radius(d => nodeR(d, metric)+25);
+  simulation.alpha(0.35).restart();
+}
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const m = btn.dataset.mode;
+    switchMode(m);
+    document.querySelectorAll('.rank-tab').forEach(t => t.classList.toggle('active', t.dataset.metric===m));
+    updateRanking(m);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+updateRanking('degree');
+
+// Resize
+const ro = new ResizeObserver(() => {
+  W = graphPanel.clientWidth;
+  H = graphPanel.clientHeight;
+  svg.attr('width',W).attr('height',H);
+  simulation.force('center', d3.forceCenter(W/2,H/2));
+  simulation.alpha(0.05).restart();
+});
+ro.observe(graphPanel);
+</script>
+</body>
+</html>
